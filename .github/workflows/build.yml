@@ -20,7 +20,16 @@ jobs:
       - uses: gradle/actions/setup-gradle@v4
 
       - name: Debug-APK bauen
-        run: ./gradlew assembleDebug --stacktrace
+        shell: bash
+        run: |
+          set -o pipefail
+          ./gradlew assembleDebug 2>&1 | tee build.log
+
+      - name: Build-Fehler als Annotationen
+        if: failure()
+        shell: bash
+        run: |
+          grep -E '^e: |What went wrong|^> |Caused by|error:' build.log | head -10 | while IFS= read -r line; do echo "::error title=Build::$line"; done
 
       - name: Lint
         run: ./gradlew lintDebug
