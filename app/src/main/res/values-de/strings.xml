@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="wallpaper_description">Eine Binäruhr als Live Wallpaper für Homescreen und Sperrbildschirm.</string>
+    <string name="widget_description">Binäruhr mit Stunden und Minuten</string>
+    <string name="widget_content_description">Binäruhr</string>
+
+    <string name="section_style">Stil</string>
+    <string name="section_color">Akzentfarbe</string>
+    <string name="section_display">Anzeige</string>
+    <string name="section_how_to_read">So liest du die Uhr</string>
+
+    <string name="style_classic">Klassisch</string>
+    <string name="style_binary">Binär</string>
+    <string name="style_led">LED</string>
+    <string name="style_paper">Papier</string>
+
+    <string name="color_default">Standard</string>
+    <string name="cd_color_swatch">Akzentfarbe %1$s</string>
+    <string name="cd_preview">Vorschau der Binäruhr</string>
+
+    <string name="option_seconds">Sekunden anzeigen</string>
+    <string name="option_seconds_desc">Nur im Wallpaper – das Widget aktualisiert sich einmal pro Minute</string>
+    <string name="option_hints">Lernhilfe</string>
+    <string name="option_hints_desc">Zeigt Uhrzeit bzw. Stellenwerte zusätzlich als Zahlen</string>
+    <string name="option_date">Datum anzeigen</string>
+
+    <string name="action_set_wallpaper">Als Live Wallpaper festlegen</string>
+    <string name="widget_hint">Widget: lange auf den Homescreen tippen → Widgets → Binary-Clock.</string>
+
+    <string name="exact_alarm_title">Widget minutengenau aktualisieren</string>
+    <string name="exact_alarm_text">Damit das Widget exakt zu jeder vollen Minute umspringt, braucht es die Berechtigung „Wecker &amp; Erinnerungen“. Ohne sie kann es ein paar Minuten hinterherhinken.</string>
+    <string name="exact_alarm_action">Berechtigung erteilen</string>
+
+    <string name="how_to_read_bcd">Jede Spalte ist eine Ziffer von HH:MM:SS. Die Punkte haben von unten nach oben die Werte 1, 2, 4 und 8 – addiere die leuchtenden.</string>
+    <string name="how_to_read_binary">Jede Zeile ist eine Zahl: Stunde, Minute, Sekunde. Die Stellen haben von rechts nach links die Werte 1, 2, 4, 8, 16 und 32 – addiere die leuchtenden.</string>
+</resources>

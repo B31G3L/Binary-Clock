@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 3x3-Punktraster wie eine Mini-Binäruhr; hell = an, gedimmt = aus. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- Spalte 1 -->
+    <path android:fillColor="#33FFFFFF" android:pathData="M38,38m-6,0a6,6 0,1 1,12 0a6,6 0,1 1,-12 0" />
+    <path android:fillColor="#FFFFB347" android:pathData="M38,54m-6,0a6,6 0,1 1,12 0a6,6 0,1 1,-12 0" />
+    <path android:fillColor="#FFFFB347" android:pathData="M38,70m-6,0a6,6 0,1 1,12 0a6,6 0,1 1,-12 0" />
+    <!-- Spalte 2 -->
+    <path android:fillColor="#FFFFB347" android:pathData="M54,38m-6,0a6,6 0,1 1,12 0a6,6 0,1 1,-12 0" />
+    <path android:fillColor="#33FFFFFF" android:pathData="M54,54m-6,0a6,6 0,1 1,12 0a6,6 0,1 1,-12 0" />
+    <path android:fillColor="#FFFFB347" android:pathData="M54,70m-6,0a6,6 0,1 1,12 0a6,6 0,1 1,-12 0" />
+    <!-- Spalte 3 -->
+    <path android:fillColor="#33FFFFFF" android:pathData="M70,38m-6,0a6,6 0,1 1,12 0a6,6 0,1 1,-12 0" />
+    <path android:fillColor="#33FFFFFF" android:pathData="M70,54m-6,0a6,6 0,1 1,12 0a6,6 0,1 1,-12 0" />
+    <path android:fillColor="#FFFFB347" android:pathData="M70,70m-6,0a6,6 0,1 1,12 0a6,6 0,1 1,-12 0" />
+</vector>

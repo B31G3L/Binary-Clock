@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name" translatable="false">Binary-Clock</string>
+    <string name="wallpaper_description">A binary clock as a live wallpaper for your home and lock screen.</string>
+    <string name="widget_description">Binary clock showing hours and minutes</string>
+    <string name="widget_content_description">Binary clock</string>
+
+    <string name="section_style">Style</string>
+    <string name="section_color">Accent color</string>
+    <string name="section_display">Display</string>
+    <string name="section_how_to_read">How to read the clock</string>
+
+    <string name="style_classic">Classic</string>
+    <string name="style_binary">Binary</string>
+    <string name="style_led">LED</string>
+    <string name="style_paper">Paper</string>
+
+    <string name="color_default">Default</string>
+    <string name="cd_color_swatch">Accent color %1$s</string>
+    <string name="cd_preview">Preview of the binary clock</string>
+
+    <string name="option_seconds">Show seconds</string>
+    <string name="option_seconds_desc">Wallpaper only – the widget updates once a minute</string>
+    <string name="option_hints">Reading aid</string>
+    <string name="option_hints_desc">Also shows the time or place values as numbers</string>
+    <string name="option_date">Show date</string>
+
+    <string name="action_set_wallpaper">Set as live wallpaper</string>
+    <string name="widget_hint">Widget: long-press your home screen → Widgets → Binary-Clock.</string>
+
+    <string name="exact_alarm_title">Update the widget on the minute</string>
+    <string name="exact_alarm_text">To flip exactly at every full minute, the widget needs the “Alarms &amp; reminders” permission. Without it, it may lag behind by a few minutes.</string>
+    <string name="exact_alarm_action">Grant permission</string>
+
+    <string name="how_to_read_bcd">Each column is one digit of HH:MM:SS. From bottom to top the dots are worth 1, 2, 4 and 8 – add up the lit ones.</string>
+    <string name="how_to_read_binary">Each row is one number: hours, minutes, seconds. From right to left the places are worth 1, 2, 4, 8, 16 and 32 – add up the lit ones.</string>
+</resources>
