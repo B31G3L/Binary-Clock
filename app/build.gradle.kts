@@ -56,7 +56,7 @@ android {
     lint {
         // Befunde direkt ins CI-Log schreiben.
         textReport = true
-        textOutput = file("stdout")
+        textOutput = file("build/reports/lint.txt")
     }
 
     buildFeatures {

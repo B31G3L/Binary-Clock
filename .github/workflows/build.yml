@@ -25,6 +25,16 @@ jobs:
       - name: Lint
         run: ./gradlew lintDebug
 
+      - name: Lint-Befunde als Annotationen
+        if: always()
+        run: |
+          f=app/build/reports/lint.txt
+          [ -f "$f" ] || exit 0
+          grep -E ': (Warning|Error|Information): ' "$f" | head -40 | while IFS= read -r line; do
+            echo "::warning title=Lint::$line"
+          done
+          tail -1 "$f"
+
       - name: Release-Build (unsigniert) prüfen – R8/Shrinking
         run: ./gradlew bundleRelease
 
