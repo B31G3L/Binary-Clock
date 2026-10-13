@@ -25,7 +25,7 @@ Eine Binäruhr für Android – als **Live Wallpaper** (Homescreen + Sperrbildsc
 | `widget` | `BinaryClockWidget` + `WidgetUpdater` (Bitmap-Rendering, Minuten-Alarm) |
 | `ui` | Compose-Oberfläche (Material 3) |
 
-Stack: Kotlin, Jetpack Compose, Material 3, manuelle DI über `AppContainer`, minSdk 26, targetSdk 35.
+Stack: Kotlin, Jetpack Compose, Material 3, manuelle DI über `AppContainer`, minSdk 26, targetSdk 36.
 
 ## Bauen
 
