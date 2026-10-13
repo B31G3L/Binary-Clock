@@ -6,18 +6,35 @@ plugins {
 
 android {
     namespace = "com.beigel.binaryclock"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.beigel.binaryclock"
         minSdk = 26
-        targetSdk = 35
+        targetSdk = 36
         versionCode = 1
         versionName = "1.0.0"
     }
 
+    // Release-Signatur kommt aus Umgebungsvariablen (lokal oder GitHub-Secrets),
+    // damit der Schlüssel nie im Repo landet. Fehlen sie, wird unsigniert gebaut.
+    val keystorePath = System.getenv("BC_KEYSTORE_FILE")
+    signingConfigs {
+        if (keystorePath != null) {
+            create("release") {
+                storeFile = file(keystorePath)
+                storePassword = System.getenv("BC_KEYSTORE_PASSWORD")
+                keyAlias = System.getenv("BC_KEY_ALIAS")
+                keyPassword = System.getenv("BC_KEY_PASSWORD")
+            }
+        }
+    }
+
     buildTypes {
         release {
+            if (keystorePath != null) {
+                signingConfig = signingConfigs.getByName("release")
+            }
             isMinifyEnabled = true
             isShrinkResources = true
             proguardFiles(

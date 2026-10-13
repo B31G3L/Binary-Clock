@@ -22,7 +22,19 @@ jobs:
       - name: Debug-APK bauen
         run: ./gradlew assembleDebug --stacktrace
 
+      - name: Lint
+        run: ./gradlew lintDebug
+
+      - name: Release-Build (unsigniert) prüfen – R8/Shrinking
+        run: ./gradlew bundleRelease
+
       - uses: actions/upload-artifact@v4
         with:
           name: binary-clock-debug
           path: app/build/outputs/apk/debug/app-debug.apk
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: lint-report
+          path: app/build/reports/lint-results-debug.*
