@@ -25,15 +25,33 @@ jobs:
       - name: Lint
         run: ./gradlew lintDebug
 
-      - name: Lint-Befunde als Annotationen
+      - name: Lint-Befunde 1-10
         if: always()
         run: |
           f=app/build/reports/lint.txt
           [ -f "$f" ] || exit 0
-          grep -E ': (Warning|Error|Information): ' "$f" | head -40 | while IFS= read -r line; do
-            echo "::warning title=Lint::$line"
-          done
-          tail -1 "$f"
+          grep -E ': (Warning|Error|Information): ' "$f" | sed -n '1,10p' | while IFS= read -r line; do echo "::warning title=Lint::$line"; done
+      - name: Lint-Befunde 11-20
+        if: always()
+        run: |
+          f=app/build/reports/lint.txt
+          [ -f "$f" ] || exit 0
+          grep -E ': (Warning|Error|Information): ' "$f" | sed -n '11,20p' | while IFS= read -r line; do echo "::warning title=Lint::$line"; done
+      - name: Lint-Befunde 21-30
+        if: always()
+        run: |
+          f=app/build/reports/lint.txt
+          [ -f "$f" ] || exit 0
+          grep -E ': (Warning|Error|Information): ' "$f" | sed -n '21,30p' | while IFS= read -r line; do echo "::warning title=Lint::$line"; done
+      - name: Lint-Befunde 31-40
+        if: always()
+        run: |
+          f=app/build/reports/lint.txt
+          [ -f "$f" ] || exit 0
+          grep -E ': (Warning|Error|Information): ' "$f" | sed -n '31,40p' | while IFS= read -r line; do echo "::warning title=Lint::$line"; done
+      - name: Lint-Zusammenfassung
+        if: always()
+        run: '[ -f app/build/reports/lint.txt ] && echo "::notice title=Lint-Summe::$(tail -1 app/build/reports/lint.txt)" || true'
 
       - name: Release-Build (unsigniert) prüfen – R8/Shrinking
         run: ./gradlew bundleRelease

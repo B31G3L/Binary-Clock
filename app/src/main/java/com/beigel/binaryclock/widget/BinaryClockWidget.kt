@@ -7,11 +7,11 @@ import android.appwidget.AppWidgetProvider
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
-import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.os.Build
 import android.os.Bundle
 import android.widget.RemoteViews
+import androidx.core.graphics.createBitmap
 import com.beigel.binaryclock.MainActivity
 import com.beigel.binaryclock.R
 import com.beigel.binaryclock.appContainer
@@ -95,7 +95,7 @@ object WidgetUpdater {
         }
         val scaleToPx = w / (widthDp * density)
 
-        val bitmap = Bitmap.createBitmap(w.toInt().coerceAtLeast(1), h.toInt().coerceAtLeast(1), Bitmap.Config.ARGB_8888)
+        val bitmap = createBitmap(w.toInt().coerceAtLeast(1), h.toInt().coerceAtLeast(1))
         val settings = context.appContainer.settingsRepository.settings.value
             .copy(showSeconds = false)
         renderer.draw(
