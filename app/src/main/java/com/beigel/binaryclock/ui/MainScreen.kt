@@ -5,7 +5,6 @@ import android.content.ActivityNotFoundException
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
 import android.os.Build
 import android.provider.Settings
 import androidx.compose.foundation.BorderStroke
@@ -58,6 +57,7 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.core.net.toUri
 import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.beigel.binaryclock.R
@@ -337,7 +337,7 @@ private fun openWallpaperPicker(context: Context) {
 private fun requestExactAlarm(context: Context) {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
         context.startActivity(
-            Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM, Uri.parse("package:${context.packageName}")),
+            Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM, "package:${context.packageName}".toUri()),
         )
     }
 }

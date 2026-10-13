@@ -5,6 +5,7 @@ import android.graphics.Paint
 import android.graphics.RectF
 import android.graphics.Typeface
 import android.text.format.DateFormat
+import androidx.core.graphics.withTranslation
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
@@ -76,16 +77,15 @@ class ClockRenderer {
         val top = (height * centerYFraction - blockH / 2f)
             .coerceIn(0f, (height - blockH).coerceAtLeast(0f))
 
-        canvas.save()
-        canvas.translate(width / 2f - dim.w * scale / 2f, top)
-        canvas.scale(scale, scale)
-        when (style) {
-            ClockStyle.CLASSIC -> drawClassic(canvas, settings, time, date, dim)
-            ClockStyle.BINARY -> drawBinary(canvas, settings, time, date)
-            ClockStyle.LED -> drawLed(canvas, settings, time, date, dim)
-            ClockStyle.PAPER -> drawPaper(canvas, settings, time, date, dim)
+        canvas.withTranslation(width / 2f - dim.w * scale / 2f, top) {
+            scale(scale, scale)
+            when (style) {
+                ClockStyle.CLASSIC -> drawClassic(this, settings, time, date, dim)
+                ClockStyle.BINARY -> drawBinary(this, settings, time, date)
+                ClockStyle.LED -> drawLed(this, settings, time, date, dim)
+                ClockStyle.PAPER -> drawPaper(this, settings, time, date, dim)
+            }
         }
-        canvas.restore()
         fill.clearShadowLayer()
     }
 
