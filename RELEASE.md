@@ -37,7 +37,7 @@ Repo → *Settings* → *Secrets and variables* → *Actions* → *New repositor
 - Store-Eintrag: Texte und Grafiken liegen unter `fastlane/metadata/android/`
 - Datensicherheit: keine Daten erhoben, keine Daten geteilt
 - Altersfreigabe-Fragebogen ausfüllen (keine kritischen Inhalte)
-- Datenschutzerklärung-URL eintragen
+- Datenschutzerklärung-URL eintragen: https://b31g3l.github.io/binary-clock/
 - AAB zuerst in einen Test-Track laden
 
 Lokal bauen geht auch:
