@@ -53,6 +53,12 @@ android {
         jvmTarget = "17"
     }
 
+    lint {
+        // Befunde direkt ins CI-Log schreiben.
+        textReport = true
+        textOutput = file("stdout")
+    }
+
     buildFeatures {
         compose = true
     }

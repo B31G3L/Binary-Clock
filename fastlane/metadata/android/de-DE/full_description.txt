@@ -1,0 +1,23 @@
+Lies die Uhrzeit in Bits. Binary-Clock macht aus deinem Hintergrund eine leuchtende Binäruhr – auf dem Homescreen, auf dem Sperrbildschirm und als Widget.
+
+VIER STILE
+• Klassisch – eine Punktspalte pro Ziffer (BCD), warmes Bernstein auf Schwarz
+• Binär – Stunde, Minute und Sekunde als echte Binärzahlen
+• LED – eckige Leuchtdioden im Gehäuse, mit Ziffern darunter
+• Papier – heller, ruhiger Look mit roten Sekunden
+
+ANPASSBAR
+• Akzentfarbe frei wählbar
+• Sekunden, Datum und Lernhilfe ein- oder ausblenden
+• Auf dem Sperrbildschirm rückt die Uhr automatisch unter die Systemuhr
+
+LERNHILFE
+Neu bei Binäruhren? Die Lernhilfe zeigt die Uhrzeit oder die Stellenwerte zusätzlich als Zahlen. Nach ein paar Tagen liest du die Punkte ganz ohne.
+
+SPARSAM
+Das Live Wallpaper zeichnet nur, solange es sichtbar ist. Das Widget aktualisiert sich einmal pro Minute.
+
+PRIVAT
+Keine Werbung, keine Konten, keine Datenerfassung, keine Internetverbindung.
+
+So liest du die Uhr: Jeder leuchtende Punkt hat einen Wert – 1, 2, 4, 8 (und bei der echten Binärdarstellung 16 und 32). Zähl die leuchtenden Punkte einer Spalte oder Zeile zusammen, schon hast du die Ziffer.
