@@ -23,6 +23,8 @@
     <string name="option_hints">Lernhilfe</string>
     <string name="option_hints_desc">Zeigt Uhrzeit bzw. Stellenwerte zusätzlich als Zahlen</string>
     <string name="option_date">Datum anzeigen</string>
+    <string name="option_lock_adjust">Platz auf dem Sperrbildschirm</string>
+    <string name="option_lock_adjust_desc">Rückt die Uhr unter die Systemuhr und blendet dort das Datum aus</string>
 
     <string name="action_set_wallpaper">Als Live Wallpaper festlegen</string>
     <string name="widget_hint">Widget: lange auf den Homescreen tippen → Widgets → Binary-Clock.</string>

@@ -39,6 +39,7 @@ class SettingsRepository(context: Context) {
             putBoolean(KEY_SECONDS, next.showSeconds)
             putBoolean(KEY_HINTS, next.showHints)
             putBoolean(KEY_DATE, next.showDate)
+            putBoolean(KEY_LOCK_ADJUST, next.lockScreenAdjust)
         }
     }
 
@@ -53,6 +54,7 @@ class SettingsRepository(context: Context) {
             showSeconds = prefs.getBoolean(KEY_SECONDS, defaults.showSeconds),
             showHints = prefs.getBoolean(KEY_HINTS, defaults.showHints),
             showDate = prefs.getBoolean(KEY_DATE, defaults.showDate),
+            lockScreenAdjust = prefs.getBoolean(KEY_LOCK_ADJUST, defaults.lockScreenAdjust),
         )
     }
 
@@ -63,5 +65,6 @@ class SettingsRepository(context: Context) {
         const val KEY_SECONDS = "show_seconds"
         const val KEY_HINTS = "show_hints"
         const val KEY_DATE = "show_date"
+        const val KEY_LOCK_ADJUST = "lock_screen_adjust"
     }
 }

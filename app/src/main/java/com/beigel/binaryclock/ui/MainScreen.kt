@@ -159,6 +159,12 @@ fun MainScreen(repository: SettingsRepository) {
                     checked = settings.showDate,
                     onChange = { v -> update { it.copy(showDate = v) } },
                 )
+                SwitchRow(
+                    title = stringResource(R.string.option_lock_adjust),
+                    subtitle = stringResource(R.string.option_lock_adjust_desc),
+                    checked = settings.lockScreenAdjust,
+                    onChange = { v -> update { it.copy(lockScreenAdjust = v) } },
+                )
             }
 
             if (hasWidgets && !canScheduleExact) {

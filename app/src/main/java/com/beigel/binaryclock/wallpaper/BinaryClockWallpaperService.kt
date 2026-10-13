@@ -1,5 +1,12 @@
 package com.beigel.binaryclock.wallpaper
 
+import android.app.KeyguardManager
+import android.app.WallpaperManager
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
+import android.os.Build
 import android.os.Handler
 import android.os.Looper
 import android.service.wallpaper.WallpaperService
@@ -17,6 +24,10 @@ import java.util.Calendar
 /**
  * Live Wallpaper: zeichnet die Uhr jede Sekunde (bzw. jede Minute ohne Sekundenanzeige)
  * neu, aber nur solange der Hintergrund sichtbar ist.
+ *
+ * Auf dem Sperrbildschirm zeichnet Android seine eigene Uhr darüber, die wir nicht
+ * ausblenden können. Deshalb rückt die Binäruhr dort (optional) nach unten und
+ * lässt das Datum weg.
  */
 class BinaryClockWallpaperService : WallpaperService() {
 
@@ -27,6 +38,7 @@ class BinaryClockWallpaperService : WallpaperService() {
         private val handler = Handler(Looper.getMainLooper())
         private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
         private val renderer = ClockRenderer()
+        private val keyguard = getSystemService(KeyguardManager::class.java)
         private var settings: ClockSettings = applicationContext.appContainer.settingsRepository.settings.value
         private var visible = false
         private var surfaceWidth = 0
@@ -39,13 +51,30 @@ class BinaryClockWallpaperService : WallpaperService() {
             }
         }
 
+        /** Sperren/Entsperren: sofort im passenden Layout neu zeichnen. */
+        private val lockReceiver = object : BroadcastReceiver() {
+            override fun onReceive(context: Context, intent: Intent) {
+                drawFrame()
+                // Die Keyguard-Animation dauert etwas – kurz danach noch einmal zeichnen.
+                handler.postDelayed({ drawFrame() }, 400)
+            }
+        }
+        private var receiverRegistered = false
+
         override fun onCreate(surfaceHolder: SurfaceHolder) {
             super.onCreate(surfaceHolder)
             setTouchEventsEnabled(false)
+            val filter = IntentFilter().apply {
+                addAction(Intent.ACTION_SCREEN_OFF)
+                addAction(Intent.ACTION_SCREEN_ON)
+                addAction(Intent.ACTION_USER_PRESENT)
+            }
+            registerReceiver(lockReceiver, filter)
+            receiverRegistered = true
             scope.launch {
                 applicationContext.appContainer.settingsRepository.settings.collect {
                     settings = it
-                    if (visible) restartTicking()
+                    if (visible) restartTicking() else drawFrame()
                 }
             }
         }
@@ -69,7 +98,11 @@ class BinaryClockWallpaperService : WallpaperService() {
         }
 
         override fun onDestroy() {
-            handler.removeCallbacks(tick)
+            handler.removeCallbacksAndMessages(null)
+            if (receiverRegistered) {
+                unregisterReceiver(lockReceiver)
+                receiverRegistered = false
+            }
             scope.cancel()
             super.onDestroy()
         }
@@ -87,8 +120,22 @@ class BinaryClockWallpaperService : WallpaperService() {
             handler.postDelayed(tick, period - now % period + 5)
         }
 
+        /** Wird gerade der Sperrbildschirm gezeigt (bzw. ist dies das Sperrbildschirm-Wallpaper)? */
+        private fun onLockScreen(): Boolean {
+            if (isPreview) return false
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+                // Ab Android 14 kann es getrennte Instanzen für Home und Sperrbildschirm geben.
+                when (wallpaperFlags) {
+                    WallpaperManager.FLAG_LOCK -> return true
+                    WallpaperManager.FLAG_SYSTEM -> return false
+                }
+            }
+            return keyguard?.isKeyguardLocked == true
+        }
+
         private fun drawFrame() {
             if (surfaceWidth == 0 || surfaceHeight == 0) return
+            val lock = settings.lockScreenAdjust && onLockScreen()
             val holder = surfaceHolder
             val canvas = try {
                 holder.lockCanvas()
@@ -96,13 +143,16 @@ class BinaryClockWallpaperService : WallpaperService() {
                 null
             } ?: return
             try {
+                val w = surfaceWidth.toFloat()
                 renderer.draw(
                     canvas = canvas,
-                    width = surfaceWidth.toFloat(),
+                    width = w,
                     height = surfaceHeight.toFloat(),
-                    settings = settings,
+                    settings = if (lock) settings.copy(showDate = false) else settings,
                     now = Calendar.getInstance(),
-                    centerYFraction = 0.45f,
+                    // Sperrbildschirm: unter die Systemuhr, etwas kleiner.
+                    centerYFraction = if (lock) 0.66f else 0.45f,
+                    maxScale = if (lock) w / 390f * 0.8f else w / 390f,
                 )
             } finally {
                 holder.unlockCanvasAndPost(canvas)

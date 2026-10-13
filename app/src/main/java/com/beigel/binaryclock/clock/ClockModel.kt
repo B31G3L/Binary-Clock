@@ -32,6 +32,8 @@ data class ClockSettings(
     val showSeconds: Boolean = true,
     val showHints: Boolean = true,
     val showDate: Boolean = true,
+    /** Auf dem Sperrbildschirm unter die Systemuhr rücken und das Datum weglassen. */
+    val lockScreenAdjust: Boolean = true,
 ) {
     val accent: Int get() = accentOverride ?: style.defaultAccent
 

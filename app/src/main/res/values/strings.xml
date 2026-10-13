@@ -24,6 +24,8 @@
     <string name="option_hints">Reading aid</string>
     <string name="option_hints_desc">Also shows the time or place values as numbers</string>
     <string name="option_date">Show date</string>
+    <string name="option_lock_adjust">Make room on the lock screen</string>
+    <string name="option_lock_adjust_desc">Moves the clock below the system clock and hides the date there</string>
 
     <string name="action_set_wallpaper">Set as live wallpaper</string>
     <string name="widget_hint">Widget: long-press your home screen → Widgets → Binary-Clock.</string>
