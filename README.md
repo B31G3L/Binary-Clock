@@ -33,7 +33,11 @@ Stack: Kotlin, Jetpack Compose, Material 3, manuelle DI über `AppContainer`, mi
 ./gradlew assembleDebug
 ```
 
-Jeder Push auf `main` baut per GitHub Actions eine Debug-APK (Artefakt `binary-clock-debug`).
+Jeder Push auf `main` baut per GitHub Actions eine Debug-APK (Artefakt `binary-clock-debug`), führt Lint aus und prüft den Release-Build.
+
+## Veröffentlichen
+
+Siehe [RELEASE.md](RELEASE.md). Store-Texte und -Grafiken (DE/EN) liegen unter `fastlane/metadata/android/`.
 
 ---
 © Beigel Apps
