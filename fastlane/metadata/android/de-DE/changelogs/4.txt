@@ -1,0 +1,10 @@
+Erste Version von Binary-Clock!
+
+• Binäruhr als Live Wallpaper für Homescreen und Sperrbildschirm
+• Widget für den Homescreen
+• 7 Stile: Klassisch, Binär, LED, Papier, Ringe, Terminal, Balken
+• Jeder Stil in Hell und Dunkel, automatisch passend zum System
+• Akzentfarbe frei wählbar
+• Position und Größe per Ziehen und Zoomen, mit Einrasten in der Mitte
+• Homescreen und Sperrbildschirm unabhängig einstellbar
+• Lernhilfe zum Ablesen
