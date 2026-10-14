@@ -1,9 +1,9 @@
-Tell time in bits. Binary-Clock turns your background into a glowing binary clock – on your home screen, your lock screen and as a widget.
+Tell time in bits. Binary-Clock turns your background into a binary clock – on your home screen, your lock screen and as a widget.
 
 SEVEN STYLES – EACH IN LIGHT AND DARK
-• Classic – one column of dots per digit (BCD)
+• Classic – one column of dots per digit
 • Binary – hours, minutes and seconds as true binary numbers
-• LED – square light-emitting diodes in a case, with digits underneath
+• LED – square light-emitting diodes in a case
 • Paper – a calm look with red seconds
 • Rings – three rings for hours, minutes and seconds
 • Terminal – ones and zeros like on the command line
@@ -12,17 +12,21 @@ SEVEN STYLES – EACH IN LIGHT AND DARK
 MAKE IT YOURS
 • Light, dark or automatic, following your system
 • Pick any accent color
-• Place and size the clock freely – just drag and pinch in the preview
+• Drag and pinch to place and size the clock – it snaps to the center
 • Set up home screen and lock screen completely independently
 • Show or hide seconds, date and the reading aid
 
+WIDGET
+The binary clock as a widget for your home screen – in any size.
+
 READING AID
-New to binary clocks? The reading aid also shows the time or the place values as numbers. After a few days you'll read the dots without it.
+New to binary clocks? The reading aid also shows the time or the place values as numbers. After a few days you'll read the bits without it.
+
+HOW TO READ IT
+Every active bit has a value – 1, 2, 4, 8, and in true binary mode also 16 and 32. Add up the active bits in a column, row or ring and you have the number.
 
 LIGHT ON BATTERY
 The live wallpaper only draws while it's visible. The widget updates once a minute.
 
 PRIVATE
 No ads, no accounts, no data collection, no internet connection.
-
-How to read it: every lit dot has a value – 1, 2, 4, 8 (and 16 and 32 in true binary mode). Add up the lit dots in a column or row and you have the number.

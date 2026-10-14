@@ -1,28 +1,32 @@
-Lies die Uhrzeit in Bits. Binary-Clock macht aus deinem Hintergrund eine leuchtende Binäruhr – auf dem Homescreen, auf dem Sperrbildschirm und als Widget.
+Lies die Uhrzeit in Bits. Binary-Clock macht deinen Hintergrund zur Binäruhr – auf dem Homescreen, auf dem Sperrbildschirm und als Widget.
 
 SIEBEN STILE – JEWEILS HELL UND DUNKEL
-• Klassisch – eine Punktspalte pro Ziffer (BCD)
+• Klassisch – eine Punktspalte pro Ziffer
 • Binär – Stunde, Minute und Sekunde als echte Binärzahlen
-• LED – eckige Leuchtdioden im Gehäuse, mit Ziffern darunter
+• LED – eckige Leuchtdioden im Gehäuse
 • Papier – ruhiger Look mit roten Sekunden
 • Ringe – drei Ringe für Stunde, Minute und Sekunde
 • Terminal – Einsen und Nullen wie auf der Kommandozeile
 • Balken – minimalistische Striche
 
-ANPASSBAR
+GANZ NACH DEINEM GESCHMACK
 • Hell, dunkel oder automatisch passend zum System
 • Akzentfarbe frei wählbar
-• Position und Größe frei wählbar – einfach in der Vorschau ziehen und zoomen
+• Position und Größe per Ziehen und Zoomen – die Uhr rastet in der Mitte ein
 • Homescreen und Sperrbildschirm komplett unabhängig einstellbar
 • Sekunden, Datum und Lernhilfe ein- oder ausblenden
 
+WIDGET
+Die Binäruhr auch als Widget für deinen Homescreen – in jeder Größe.
+
 LERNHILFE
 Neu bei Binäruhren? Die Lernhilfe zeigt die Uhrzeit oder die Stellenwerte zusätzlich als Zahlen. Nach ein paar Tagen liest du die Punkte ganz ohne.
+
+SO LIEST DU DIE UHR
+Jedes aktive Bit hat einen Wert – 1, 2, 4, 8 und bei der echten Binärdarstellung zusätzlich 16 und 32. Zähl die aktiven Bits einer Spalte, Zeile oder eines Rings zusammen, schon hast du die Zahl.
 
 SPARSAM
 Das Live Wallpaper zeichnet nur, solange es sichtbar ist. Das Widget aktualisiert sich einmal pro Minute.
 
 PRIVAT
 Keine Werbung, keine Konten, keine Datenerfassung, keine Internetverbindung.
-
-So liest du die Uhr: Jeder leuchtende Punkt hat einen Wert – 1, 2, 4, 8 (und bei der echten Binärdarstellung 16 und 32). Zähl die leuchtenden Punkte einer Spalte oder Zeile zusammen, schon hast du die Ziffer.
