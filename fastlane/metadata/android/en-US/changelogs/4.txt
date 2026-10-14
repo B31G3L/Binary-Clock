@@ -1,0 +1,10 @@
+First release of Binary-Clock!
+
+• Binary clock live wallpaper for home and lock screen
+• Home screen widget
+• 7 styles: Classic, Binary, LED, Paper, Rings, Terminal, Bars
+• Every style in light and dark, following your system
+• Pick any accent color
+• Drag and pinch to place and size the clock, snaps to the center
+• Set up home and lock screen independently
+• Reading aid to learn the binary clock
