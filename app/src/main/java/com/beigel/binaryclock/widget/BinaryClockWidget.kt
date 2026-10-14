@@ -104,6 +104,7 @@ object WidgetUpdater {
             height = bitmap.height.toFloat(),
             settings = settings,
             now = Calendar.getInstance(),
+            dark = settings.themeMode.isDark(context),
             cornerRadius = 24f * density * scaleToPx,
             maxScale = Float.MAX_VALUE,
         )

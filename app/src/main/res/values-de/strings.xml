@@ -23,8 +23,8 @@
     <string name="option_hints">Lernhilfe</string>
     <string name="option_hints_desc">Zeigt Uhrzeit bzw. Stellenwerte zusätzlich als Zahlen</string>
     <string name="option_date">Datum anzeigen</string>
-    <string name="option_lock_adjust">Platz auf dem Sperrbildschirm</string>
-    <string name="option_lock_adjust_desc">Rückt die Uhr unter die Systemuhr und blendet dort das Datum aus</string>
+    <string name="option_lock_adjust">Eigenes Layout für den Sperrbildschirm</string>
+    <string name="option_lock_adjust_desc">Eigene Position und Größe, dort ohne Datum – damit sie nicht mit der Systemuhr kollidiert</string>
 
     <string name="action_set_wallpaper">Als Live Wallpaper festlegen</string>
     <string name="widget_hint">Widget: lange auf den Homescreen tippen → Widgets → Binary-Clock.</string>
@@ -35,4 +35,23 @@
 
     <string name="how_to_read_bcd">Jede Spalte ist eine Ziffer von HH:MM:SS. Die Punkte haben von unten nach oben die Werte 1, 2, 4 und 8 – addiere die leuchtenden.</string>
     <string name="how_to_read_binary">Jede Zeile ist eine Zahl: Stunde, Minute, Sekunde. Die Stellen haben von rechts nach links die Werte 1, 2, 4, 8, 16 und 32 – addiere die leuchtenden.</string>
+    <string name="style_rings">Ringe</string>
+    <string name="style_terminal">Terminal</string>
+    <string name="style_bars">Balken</string>
+
+    <string name="section_theme">Darstellung</string>
+    <string name="theme_system">System</string>
+    <string name="theme_light">Hell</string>
+    <string name="theme_dark">Dunkel</string>
+
+    <string name="section_position">Position &amp; Größe</string>
+    <string name="target_home">Homescreen</string>
+    <string name="target_lock">Sperrbildschirm</string>
+    <string name="position_hint">Zieh die Uhr in der Vorschau an die gewünschte Stelle, mit zwei Fingern änderst du die Größe.</string>
+    <string name="slider_horizontal">Horizontal</string>
+    <string name="slider_vertical">Vertikal</string>
+    <string name="slider_size">Größe</string>
+    <string name="action_reset">Zurücksetzen</string>
+    <string name="ghost_system_clock">Systemuhr</string>
+    <string name="how_to_read_rings">Innen Stunde, Mitte Minute, außen Sekunde. Im Uhrzeigersinn ab oben haben die Segmente die Werte 32 (bei Stunden 16), 16, 8, 4, 2 und 1 – addiere die leuchtenden.</string>
 </resources>

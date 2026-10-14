@@ -10,11 +10,14 @@ import android.provider.Settings
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.gestures.detectTransformGestures
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
@@ -37,6 +40,10 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SegmentedButton
+import androidx.compose.material3.SegmentedButtonDefaults
+import androidx.compose.material3.SingleChoiceSegmentedButtonRow
+import androidx.compose.material3.Slider
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -45,11 +52,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
@@ -64,15 +73,26 @@ import com.beigel.binaryclock.R
 import com.beigel.binaryclock.clock.ClockSettings
 import com.beigel.binaryclock.clock.ClockStyle
 import com.beigel.binaryclock.clock.Encoding
+import com.beigel.binaryclock.clock.Placement
+import com.beigel.binaryclock.clock.ThemeMode
 import com.beigel.binaryclock.data.SettingsRepository
 import com.beigel.binaryclock.wallpaper.BinaryClockWallpaperService
 import com.beigel.binaryclock.widget.WidgetUpdater
+import kotlin.math.roundToInt
+
+private enum class EditTarget { HOME, LOCK }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen(repository: SettingsRepository) {
     val context = LocalContext.current
     val settings by repository.settings.collectAsStateWithLifecycle()
+    val systemDark = isSystemInDarkTheme()
+    val dark = when (settings.themeMode) {
+        ThemeMode.SYSTEM -> systemDark
+        ThemeMode.LIGHT -> false
+        ThemeMode.DARK -> true
+    }
 
     var canScheduleExact by remember { mutableStateOf(true) }
     var hasWidgets by remember { mutableStateOf(false) }
@@ -82,9 +102,22 @@ fun MainScreen(repository: SettingsRepository) {
         onPauseOrDispose { }
     }
 
+    var targetName by rememberSaveable { mutableStateOf(EditTarget.HOME.name) }
+    val target = if (settings.lockScreenAdjust) EditTarget.valueOf(targetName) else EditTarget.HOME
+    val placement = if (target == EditTarget.LOCK) settings.lock else settings.home
+
     val update: ((ClockSettings) -> ClockSettings) -> Unit = { transform ->
+        val before = repository.settings.value
         repository.update(transform)
-        WidgetUpdater.updateAll(context)
+        val after = repository.settings.value
+        // Position/Größe betreffen nur das Wallpaper – das Widget nicht unnötig neu rendern.
+        if (before.copy(home = after.home, lock = after.lock) != after) WidgetUpdater.updateAll(context)
+    }
+    val updatePlacement: ((Placement) -> Placement) -> Unit = { transform ->
+        update { s ->
+            if (target == EditTarget.LOCK) s.copy(lock = transform(s.lock).clamped())
+            else s.copy(home = transform(s.home).clamped())
+        }
     }
 
     Scaffold(
@@ -98,16 +131,49 @@ fun MainScreen(repository: SettingsRepository) {
                 .padding(horizontal = 16.dp, vertical = 8.dp),
             verticalArrangement = Arrangement.spacedBy(24.dp),
         ) {
-            val previewDescription = stringResource(R.string.cd_preview)
-            Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-                ClockCanvas(
-                    settings = settings,
-                    modifier = Modifier
-                        .heightIn(max = 440.dp)
-                        .aspectRatio(9f / 19.5f)
-                        .clip(RoundedCornerShape(28.dp))
-                        .semantics { contentDescription = previewDescription },
-                )
+            // ---------------------------------------------------------- Vorschau
+            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                val previewDescription = stringResource(R.string.cd_preview)
+                val ghost = stringResource(R.string.ghost_system_clock)
+                Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                    ClockCanvas(
+                        settings = if (target == EditTarget.LOCK) settings.copy(showDate = false) else settings,
+                        dark = dark,
+                        placement = placement,
+                        systemClockGhost = if (target == EditTarget.LOCK) ghost else null,
+                        modifier = Modifier
+                            .heightIn(max = 460.dp)
+                            .aspectRatio(9f / 19.5f)
+                            .clip(RoundedCornerShape(28.dp))
+                            .border(1.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(28.dp))
+                            .semantics { contentDescription = previewDescription }
+                            .pointerInput(target) {
+                                detectTransformGestures { _, pan, zoom, _ ->
+                                    updatePlacement { p ->
+                                        p.copy(
+                                            x = p.x + pan.x / size.width,
+                                            y = p.y + pan.y / size.height,
+                                            size = p.size * zoom,
+                                        )
+                                    }
+                                }
+                            },
+                    )
+                }
+
+                if (settings.lockScreenAdjust) {
+                    SingleChoiceSegmentedButtonRow(Modifier.fillMaxWidth()) {
+                        EditTarget.entries.forEachIndexed { i, t ->
+                            SegmentedButton(
+                                selected = target == t,
+                                onClick = { targetName = t.name },
+                                shape = SegmentedButtonDefaults.itemShape(i, EditTarget.entries.size),
+                            ) {
+                                Text(stringResource(if (t == EditTarget.HOME) R.string.target_home else R.string.target_lock))
+                            }
+                        }
+                    }
+                }
             }
 
             Button(
@@ -119,16 +185,36 @@ fun MainScreen(repository: SettingsRepository) {
                 Text(stringResource(R.string.action_set_wallpaper))
             }
 
+            // -------------------------------------------------------------- Stil
             Section(title = stringResource(R.string.section_style)) {
-                Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                Row(
+                    modifier = Modifier.horizontalScroll(rememberScrollState()),
+                    horizontalArrangement = Arrangement.spacedBy(10.dp),
+                ) {
                     ClockStyle.entries.forEach { style ->
                         StyleTile(
                             settings = settings,
                             style = style,
+                            dark = dark,
                             selected = settings.style == style,
                             onSelect = { update { it.copy(style = style) } },
-                            modifier = Modifier.weight(1f),
+                            modifier = Modifier.width(78.dp),
                         )
+                    }
+                }
+            }
+
+            // -------------------------------------------------------- Darstellung
+            Section(title = stringResource(R.string.section_theme)) {
+                SingleChoiceSegmentedButtonRow(Modifier.fillMaxWidth()) {
+                    ThemeMode.entries.forEachIndexed { i, mode ->
+                        SegmentedButton(
+                            selected = settings.themeMode == mode,
+                            onClick = { update { it.copy(themeMode = mode) } },
+                            shape = SegmentedButtonDefaults.itemShape(i, ThemeMode.entries.size),
+                        ) {
+                            Text(stringResource(mode.label))
+                        }
                     }
                 }
             }
@@ -136,10 +222,58 @@ fun MainScreen(repository: SettingsRepository) {
             Section(title = stringResource(R.string.section_color)) {
                 AccentPicker(
                     settings = settings,
+                    dark = dark,
                     onPick = { color -> update { it.copy(accentOverride = color) } },
                 )
             }
 
+            // ------------------------------------------------- Position & Größe
+            Section(
+                title = stringResource(R.string.section_position) + if (settings.lockScreenAdjust) {
+                    " · " + stringResource(if (target == EditTarget.LOCK) R.string.target_lock else R.string.target_home)
+                } else {
+                    ""
+                },
+            ) {
+                Text(
+                    text = stringResource(R.string.position_hint),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+                LabeledSlider(
+                    label = stringResource(R.string.slider_horizontal),
+                    value = placement.x,
+                    range = 0f..1f,
+                    display = "${(placement.x * 100).roundToInt()} %",
+                    onChange = { v -> updatePlacement { it.copy(x = v) } },
+                )
+                LabeledSlider(
+                    label = stringResource(R.string.slider_vertical),
+                    value = placement.y,
+                    range = 0f..1f,
+                    display = "${(placement.y * 100).roundToInt()} %",
+                    onChange = { v -> updatePlacement { it.copy(y = v) } },
+                )
+                LabeledSlider(
+                    label = stringResource(R.string.slider_size),
+                    value = placement.size,
+                    range = Placement.MIN_SIZE..Placement.MAX_SIZE,
+                    display = "${(placement.size * 100).roundToInt()} %",
+                    onChange = { v -> updatePlacement { it.copy(size = v) } },
+                )
+                TextButton(
+                    onClick = {
+                        updatePlacement {
+                            if (target == EditTarget.LOCK) Placement.LOCK_DEFAULT else Placement.HOME_DEFAULT
+                        }
+                    },
+                    modifier = Modifier.align(Alignment.End),
+                ) {
+                    Text(stringResource(R.string.action_reset))
+                }
+            }
+
+            // ------------------------------------------------------------ Anzeige
             Section(title = stringResource(R.string.section_display)) {
                 SwitchRow(
                     title = stringResource(R.string.option_seconds),
@@ -174,12 +308,14 @@ fun MainScreen(repository: SettingsRepository) {
             Section(title = stringResource(R.string.section_how_to_read)) {
                 Text(
                     text = stringResource(
-                        if (settings.style.encoding == Encoding.BCD) R.string.how_to_read_bcd
-                        else R.string.how_to_read_binary,
+                        when {
+                            settings.style == ClockStyle.RINGS -> R.string.how_to_read_rings
+                            settings.style.encoding == Encoding.BCD -> R.string.how_to_read_bcd
+                            else -> R.string.how_to_read_binary
+                        },
                     ),
                     style = MaterialTheme.typography.bodyMedium,
                 )
-                Spacer(Modifier.height(8.dp))
                 Text(
                     text = stringResource(R.string.widget_hint),
                     style = MaterialTheme.typography.bodyMedium,
@@ -209,11 +345,12 @@ private fun Section(title: String, content: @Composable () -> Unit) {
 private fun StyleTile(
     settings: ClockSettings,
     style: ClockStyle,
+    dark: Boolean,
     selected: Boolean,
     onSelect: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val borderColor = if (selected) MaterialTheme.colorScheme.primary else Color.Transparent
+    val borderColor = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outlineVariant
     Column(
         modifier = modifier.selectable(selected = selected, role = Role.RadioButton, onClick = onSelect),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -222,13 +359,13 @@ private fun StyleTile(
         ClockCanvas(
             // Mini-Vorschau: Stil mit Standardfarbe und ohne Datum, damit sie lesbar bleibt.
             settings = settings.copy(style = style, accentOverride = null, showDate = false),
+            dark = dark,
             live = false,
-            centerYFraction = 0.5f,
             modifier = Modifier
                 .fillMaxWidth()
                 .aspectRatio(9f / 14f)
                 .clip(RoundedCornerShape(14.dp))
-                .border(BorderStroke(2.dp, borderColor), RoundedCornerShape(14.dp)),
+                .border(BorderStroke(if (selected) 2.dp else 1.dp, borderColor), RoundedCornerShape(14.dp)),
         )
         Text(
             text = stringResource(style.label),
@@ -240,14 +377,14 @@ private fun StyleTile(
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-private fun AccentPicker(settings: ClockSettings, onPick: (Int?) -> Unit) {
+private fun AccentPicker(settings: ClockSettings, dark: Boolean, onPick: (Int?) -> Unit) {
     FlowRow(
         horizontalArrangement = Arrangement.spacedBy(12.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         val options: List<Int?> = listOf<Int?>(null) + ClockSettings.ACCENT_PRESETS
         options.forEach { option ->
-            val color = option ?: settings.style.defaultAccent
+            val color = option ?: settings.style.palette(dark).accent
             val selected = settings.accentOverride == option
             val label = if (option == null) {
                 stringResource(R.string.color_default)
@@ -279,6 +416,28 @@ private fun AccentPicker(settings: ClockSettings, onPick: (Int?) -> Unit) {
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun LabeledSlider(
+    label: String,
+    value: Float,
+    range: ClosedFloatingPointRange<Float>,
+    display: String,
+    onChange: (Float) -> Unit,
+) {
+    Column {
+        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+            Text(label, style = MaterialTheme.typography.bodyMedium)
+            Text(display, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        }
+        Slider(
+            value = value.coerceIn(range.start, range.endInclusive),
+            onValueChange = onChange,
+            valueRange = range,
+            modifier = Modifier.semantics { contentDescription = label },
+        )
     }
 }
 
@@ -325,7 +484,7 @@ private fun openWallpaperPicker(context: Context) {
         .putExtra(WallpaperManager.EXTRA_LIVE_WALLPAPER_COMPONENT, component)
     try {
         context.startActivity(direct)
-    } catch (e: ActivityNotFoundException) {
+    } catch (_: ActivityNotFoundException) {
         try {
             context.startActivity(Intent(WallpaperManager.ACTION_LIVE_WALLPAPER_CHOOSER))
         } catch (_: ActivityNotFoundException) {

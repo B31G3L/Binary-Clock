@@ -5,6 +5,8 @@ import android.content.SharedPreferences
 import androidx.core.content.edit
 import com.beigel.binaryclock.clock.ClockSettings
 import com.beigel.binaryclock.clock.ClockStyle
+import com.beigel.binaryclock.clock.Placement
+import com.beigel.binaryclock.clock.ThemeMode
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -32,6 +34,7 @@ class SettingsRepository(context: Context) {
 
     fun update(transform: (ClockSettings) -> ClockSettings) {
         val next = transform(_settings.value)
+        if (next == _settings.value) return
         _settings.value = next
         prefs.edit {
             putString(KEY_STYLE, next.style.name)
@@ -39,22 +42,40 @@ class SettingsRepository(context: Context) {
             putBoolean(KEY_SECONDS, next.showSeconds)
             putBoolean(KEY_HINTS, next.showHints)
             putBoolean(KEY_DATE, next.showDate)
+            putString(KEY_THEME, next.themeMode.name)
             putBoolean(KEY_LOCK_ADJUST, next.lockScreenAdjust)
+            putPlacement(this, PREFIX_HOME, next.home)
+            putPlacement(this, PREFIX_LOCK, next.lock)
         }
     }
 
+    private fun putPlacement(editor: SharedPreferences.Editor, prefix: String, p: Placement) {
+        editor.putFloat(prefix + "x", p.x)
+        editor.putFloat(prefix + "y", p.y)
+        editor.putFloat(prefix + "size", p.size)
+    }
+
+    private fun readPlacement(prefix: String, default: Placement) = Placement(
+        x = prefs.getFloat(prefix + "x", default.x),
+        y = prefs.getFloat(prefix + "y", default.y),
+        size = prefs.getFloat(prefix + "size", default.size),
+    ).clamped()
+
+    private inline fun <reified E : Enum<E>> readEnum(key: String, default: E): E =
+        prefs.getString(key, null)?.let { name -> enumValues<E>().firstOrNull { it.name == name } } ?: default
+
     private fun read(): ClockSettings {
-        val defaults = ClockSettings()
-        val style = prefs.getString(KEY_STYLE, null)
-            ?.let { name -> ClockStyle.entries.firstOrNull { it.name == name } }
-            ?: defaults.style
+        val d = ClockSettings()
         return ClockSettings(
-            style = style,
+            style = readEnum(KEY_STYLE, d.style),
             accentOverride = if (prefs.contains(KEY_ACCENT)) prefs.getInt(KEY_ACCENT, 0) else null,
-            showSeconds = prefs.getBoolean(KEY_SECONDS, defaults.showSeconds),
-            showHints = prefs.getBoolean(KEY_HINTS, defaults.showHints),
-            showDate = prefs.getBoolean(KEY_DATE, defaults.showDate),
-            lockScreenAdjust = prefs.getBoolean(KEY_LOCK_ADJUST, defaults.lockScreenAdjust),
+            showSeconds = prefs.getBoolean(KEY_SECONDS, d.showSeconds),
+            showHints = prefs.getBoolean(KEY_HINTS, d.showHints),
+            showDate = prefs.getBoolean(KEY_DATE, d.showDate),
+            themeMode = readEnum(KEY_THEME, d.themeMode),
+            home = readPlacement(PREFIX_HOME, d.home),
+            lockScreenAdjust = prefs.getBoolean(KEY_LOCK_ADJUST, d.lockScreenAdjust),
+            lock = readPlacement(PREFIX_LOCK, d.lock),
         )
     }
 
@@ -65,6 +86,9 @@ class SettingsRepository(context: Context) {
         const val KEY_SECONDS = "show_seconds"
         const val KEY_HINTS = "show_hints"
         const val KEY_DATE = "show_date"
+        const val KEY_THEME = "theme_mode"
         const val KEY_LOCK_ADJUST = "lock_screen_adjust"
+        const val PREFIX_HOME = "home_"
+        const val PREFIX_LOCK = "lock_"
     }
 }

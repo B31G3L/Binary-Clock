@@ -1,16 +1,20 @@
 package com.beigel.binaryclock.wallpaper
 
 import android.app.KeyguardManager
+import android.app.WallpaperColors
 import android.app.WallpaperManager
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.content.res.Configuration
+import android.graphics.Color
 import android.os.Build
 import android.os.Handler
 import android.os.Looper
 import android.service.wallpaper.WallpaperService
 import android.view.SurfaceHolder
+import androidx.annotation.RequiresApi
 import com.beigel.binaryclock.appContainer
 import com.beigel.binaryclock.clock.ClockRenderer
 import com.beigel.binaryclock.clock.ClockSettings
@@ -26,12 +30,20 @@ import java.util.Calendar
  * neu, aber nur solange der Hintergrund sichtbar ist.
  *
  * Auf dem Sperrbildschirm zeichnet Android seine eigene Uhr darüber, die wir nicht
- * ausblenden können. Deshalb rückt die Binäruhr dort (optional) nach unten und
- * lässt das Datum weg.
+ * ausblenden können. Deshalb kann die Binäruhr dort eine eigene Position und Größe haben
+ * und lässt das Datum weg.
  */
 class BinaryClockWallpaperService : WallpaperService() {
 
+    private val engines = mutableSetOf<ClockEngine>()
+
     override fun onCreateEngine(): Engine = ClockEngine()
+
+    /** Hell/Dunkel des Systems hat sich geändert. */
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+        engines.forEach { it.onThemeChanged() }
+    }
 
     private inner class ClockEngine : Engine() {
 
@@ -43,6 +55,7 @@ class BinaryClockWallpaperService : WallpaperService() {
         private var visible = false
         private var surfaceWidth = 0
         private var surfaceHeight = 0
+        private var lastColorKey: Long? = null
 
         private val tick = object : Runnable {
             override fun run() {
@@ -63,6 +76,7 @@ class BinaryClockWallpaperService : WallpaperService() {
 
         override fun onCreate(surfaceHolder: SurfaceHolder) {
             super.onCreate(surfaceHolder)
+            engines += this
             setTouchEventsEnabled(false)
             val filter = IntentFilter().apply {
                 addAction(Intent.ACTION_SCREEN_OFF)
@@ -74,9 +88,15 @@ class BinaryClockWallpaperService : WallpaperService() {
             scope.launch {
                 applicationContext.appContainer.settingsRepository.settings.collect {
                     settings = it
+                    updateColorsIfNeeded()
                     if (visible) restartTicking() else drawFrame()
                 }
             }
+        }
+
+        fun onThemeChanged() {
+            updateColorsIfNeeded()
+            drawFrame()
         }
 
         override fun onVisibilityChanged(visible: Boolean) {
@@ -98,6 +118,7 @@ class BinaryClockWallpaperService : WallpaperService() {
         }
 
         override fun onDestroy() {
+            engines -= this
             handler.removeCallbacksAndMessages(null)
             if (receiverRegistered) {
                 unregisterReceiver(lockReceiver)
@@ -106,6 +127,36 @@ class BinaryClockWallpaperService : WallpaperService() {
             scope.cancel()
             super.onDestroy()
         }
+
+        /**
+         * Teilt dem System die Hintergrundfarbe mit, damit Statusleiste und Sperrbildschirm-Uhr
+         * bei hellen Stilen dunkle Schrift verwenden.
+         */
+        @RequiresApi(Build.VERSION_CODES.O_MR1)
+        override fun onComputeColors(): WallpaperColors {
+            val dark = isDark()
+            val bg = Color.valueOf(settings.style.palette(dark).background)
+            val accent = Color.valueOf(settings.accent(dark))
+            return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                val hints = if (dark) WallpaperColors.HINT_SUPPORTS_DARK_THEME else WallpaperColors.HINT_SUPPORTS_DARK_TEXT
+                WallpaperColors(bg, accent, null, hints)
+            } else {
+                WallpaperColors(bg, accent, null)
+            }
+        }
+
+        private fun updateColorsIfNeeded() {
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O_MR1) return
+            val dark = isDark()
+            val key = settings.style.palette(dark).background.toLong() shl 32 or
+                (settings.accent(dark).toLong() and 0xFFFFFFFFL)
+            if (key != lastColorKey) {
+                lastColorKey = key
+                notifyColorsChanged()
+            }
+        }
+
+        private fun isDark() = settings.themeMode.isDark(this@BinaryClockWallpaperService)
 
         private fun restartTicking() {
             handler.removeCallbacks(tick)
@@ -143,16 +194,14 @@ class BinaryClockWallpaperService : WallpaperService() {
                 null
             } ?: return
             try {
-                val w = surfaceWidth.toFloat()
                 renderer.draw(
                     canvas = canvas,
-                    width = w,
+                    width = surfaceWidth.toFloat(),
                     height = surfaceHeight.toFloat(),
                     settings = if (lock) settings.copy(showDate = false) else settings,
                     now = Calendar.getInstance(),
-                    // Sperrbildschirm: unter die Systemuhr, etwas kleiner.
-                    centerYFraction = if (lock) 0.66f else 0.45f,
-                    maxScale = if (lock) w / 390f * 0.8f else w / 390f,
+                    dark = isDark(),
+                    placement = if (lock) settings.lock else settings.home,
                 )
             } finally {
                 holder.unlockCanvasAndPost(canvas)

@@ -24,8 +24,8 @@
     <string name="option_hints">Reading aid</string>
     <string name="option_hints_desc">Also shows the time or place values as numbers</string>
     <string name="option_date">Show date</string>
-    <string name="option_lock_adjust">Make room on the lock screen</string>
-    <string name="option_lock_adjust_desc">Moves the clock below the system clock and hides the date there</string>
+    <string name="option_lock_adjust">Separate layout for lock screen</string>
+    <string name="option_lock_adjust_desc">Own position and size there, without the date – so it doesn\'t collide with the system clock</string>
 
     <string name="action_set_wallpaper">Set as live wallpaper</string>
     <string name="widget_hint">Widget: long-press your home screen → Widgets → Binary-Clock.</string>
@@ -36,4 +36,23 @@
 
     <string name="how_to_read_bcd">Each column is one digit of HH:MM:SS. From bottom to top the dots are worth 1, 2, 4 and 8 – add up the lit ones.</string>
     <string name="how_to_read_binary">Each row is one number: hours, minutes, seconds. From right to left the places are worth 1, 2, 4, 8, 16 and 32 – add up the lit ones.</string>
+    <string name="style_rings">Rings</string>
+    <string name="style_terminal">Terminal</string>
+    <string name="style_bars">Bars</string>
+
+    <string name="section_theme">Appearance</string>
+    <string name="theme_system">System</string>
+    <string name="theme_light">Light</string>
+    <string name="theme_dark">Dark</string>
+
+    <string name="section_position">Position &amp; size</string>
+    <string name="target_home">Home screen</string>
+    <string name="target_lock">Lock screen</string>
+    <string name="position_hint">Drag the clock in the preview to move it, pinch with two fingers to resize.</string>
+    <string name="slider_horizontal">Horizontal</string>
+    <string name="slider_vertical">Vertical</string>
+    <string name="slider_size">Size</string>
+    <string name="action_reset">Reset</string>
+    <string name="ghost_system_clock">System clock</string>
+    <string name="how_to_read_rings">Inner ring: hours, middle: minutes, outer: seconds. Clockwise from the top the segments are worth 32 (16 for hours), 16, 8, 4, 2 and 1 – add up the lit ones.</string>
 </resources>
