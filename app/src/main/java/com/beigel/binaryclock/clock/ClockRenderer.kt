@@ -523,8 +523,8 @@ class ClockRenderer {
         const val TE_ROW_H = 40f
         const val TE_ROW_GAP = 8f
 
-        const val BA_W = 34f
-        const val BA_H = 12f
-        const val BA_VGAP = 10f
+        const val BA_W = 38f
+        const val BA_H = 14f
+        const val BA_VGAP = 12f
     }
 }

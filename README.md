@@ -4,12 +4,16 @@ Eine Binäruhr für Android – als **Live Wallpaper** (Homescreen + Sperrbildsc
 
 ## Features
 
-- **4 Stile**
-  - *Klassisch* – BCD, eine Punktspalte pro Ziffer, Bernstein auf Schwarz
+- **7 Stile**, jeweils mit heller und dunkler Palette (System/Hell/Dunkel)
+  - *Klassisch* – BCD, eine Punktspalte pro Ziffer
   - *Binär* – Stunde/Minute/Sekunde als echte Binärzahlen (3 Zeilen)
   - *LED* – eckige „Leuchtdioden“ im Gehäuse, mit Ziffern als Lernhilfe
-  - *Papier* – heller Bauhaus-Look, Sekunden in Rot
+  - *Papier* – Bauhaus-Look, Sekunden in Rot
+  - *Ringe* – drei segmentierte Ringe
+  - *Terminal* – Einsen und Nullen in Monospace
+  - *Balken* – minimalistische Striche (BCD)
 - Akzentfarbe frei wählbar
+- Position und Größe frei wählbar (Ziehen/Zoomen in der Vorschau oder Schieberegler), getrennt für Homescreen und Sperrbildschirm
 - Sekunden, Lernhilfe (Zahlen/Stellenwerte) und Datum ein-/ausblendbar
 - Live Wallpaper tickt sekündlich, aber nur solange es sichtbar ist (akkuschonend)
 - Widget aktualisiert sich zu jeder vollen Minute (exakt, wenn die Berechtigung „Wecker & Erinnerungen“ erteilt ist)

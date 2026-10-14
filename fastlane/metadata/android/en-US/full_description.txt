@@ -1,15 +1,20 @@
 Tell time in bits. Binary-Clock turns your background into a glowing binary clock – on your home screen, your lock screen and as a widget.
 
-FOUR STYLES
-• Classic – one column of dots per digit (BCD), warm amber on black
+SEVEN STYLES – EACH IN LIGHT AND DARK
+• Classic – one column of dots per digit (BCD)
 • Binary – hours, minutes and seconds as true binary numbers
 • LED – square light-emitting diodes in a case, with digits underneath
-• Paper – a light, calm look with red seconds
+• Paper – a calm look with red seconds
+• Rings – three rings for hours, minutes and seconds
+• Terminal – ones and zeros like on the command line
+• Bars – minimalist strokes
 
 MAKE IT YOURS
+• Light, dark or automatic, following your system
 • Pick any accent color
+• Place and size the clock freely – just drag and pinch in the preview
+• Separate layout for the lock screen, so it doesn't collide with the system clock
 • Show or hide seconds, date and the reading aid
-• On the lock screen, the clock moves below the system clock automatically
 
 READING AID
 New to binary clocks? The reading aid also shows the time or the place values as numbers. After a few days you'll read the dots without it.
