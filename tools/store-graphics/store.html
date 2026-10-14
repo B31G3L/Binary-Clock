@@ -1,0 +1,167 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>store</title>
+<script src="render.js"></script>
+<style>
+  * { box-sizing: border-box; margin: 0; }
+  body { background: #333; font-family: "Inter Display", "Inter", sans-serif; }
+  .slide { width: 1080px; height: 1920px; position: relative; overflow: hidden; }
+  .bgdots { position: absolute; inset: 0; }
+  .glow { position: absolute; left: 50%; top: 1150px; width: 1100px; height: 1100px; transform: translate(-50%, -50%);
+          border-radius: 50%; filter: blur(60px); opacity: .9; }
+  .head { position: absolute; top: 120px; left: 80px; right: 80px; text-align: center; }
+  .head h1 { font-size: 92px; font-weight: 800; letter-spacing: -2px; line-height: 1.02; }
+  .head p { margin-top: 26px; font-size: 40px; font-weight: 500; line-height: 1.3; opacity: .78; }
+  .phone { position: absolute; left: 50%; top: 520px; width: 800px; height: 1720px; transform: translateX(-50%);
+           background: #0A0A0B; border-radius: 96px; padding: 20px;
+           border: 5px solid #3B3B42;
+           box-shadow: 0 70px 140px rgba(0,0,0,.55), 0 0 0 2px rgba(255,255,255,.18), 0 0 0 4px rgba(255,255,255,.06) inset; }
+  .screen { position: relative; width: 750px; height: 1680px; border-radius: 78px; overflow: hidden; }
+  .screen canvas { position: absolute; inset: 0; }
+  .island { position: absolute; top: 26px; left: 50%; width: 34px; height: 34px; margin-left: -17px; border-radius: 50%; background: #000; z-index: 3; }
+
+  /* App-Oberfläche */
+  .app { position: absolute; inset: 0; background: #121318; color: #E4E2E9; padding: 110px 40px 0; font-family: "Inter", sans-serif; }
+  .app .bar { font-size: 44px; font-weight: 600; margin-bottom: 34px; }
+  .seg { display: flex; border: 2px solid #8E8C99; border-radius: 60px; overflow: hidden; margin-bottom: 26px; }
+  .seg div { flex: 1; text-align: center; font-size: 28px; font-weight: 600; padding: 20px 0; }
+  .seg .on { background: #4A3A23; color: #FFDDB3; }
+  .seg div + div { border-left: 2px solid #8E8C99; }
+  .card { background: #24252B; border-radius: 26px; padding: 26px 28px; margin-bottom: 30px; }
+  .card b { display: block; font-size: 28px; margin-bottom: 8px; }
+  .card span { font-size: 25px; line-height: 1.35; color: #C7C5D0; }
+  .prev { position: relative; width: 470px; height: 1018px; margin: 0 auto; border-radius: 52px; overflow: hidden; border: 2px solid #46464F; }
+  .chip { position: absolute; top: 22px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,.6); color: #fff;
+          font-size: 24px; font-weight: 600; padding: 8px 20px; border-radius: 40px; }
+  .finger { position: absolute; width: 96px; height: 96px; border-radius: 50%; background: rgba(255,255,255,.28);
+            border: 3px solid rgba(255,255,255,.7); }
+  .feat { width: 1024px; height: 500px; position: relative; overflow: hidden; background: #16120D; color: #FFF4E6; }
+  .feat .txt { position: absolute; left: 64px; top: 160px; width: 440px; }
+  .feat h1 { font-size: 64px; font-weight: 800; letter-spacing: -1.5px; }
+  .feat p { font-size: 25px; margin-top: 14px; opacity: .78; line-height: 1.3; }
+  .mini { position: absolute; width: 230px; height: 500px; border-radius: 36px; background: #0A0A0B; padding: 8px;
+          border: 3px solid #3B3B42; box-shadow: 0 30px 60px rgba(0,0,0,.5); }
+  .mini canvas { border-radius: 28px; display: block; }
+</style></head>
+<body>
+<div id="root"></div>
+<script>
+const T = { h: 10, m: 24, s: 36 };
+const DATE = { de: 'Mittwoch, 14. Oktober', en: 'Wednesday, October 14' };
+const DATE_SHORT = { de: 'Mi., 14. Okt.', en: 'Wed, Oct 14' };
+const base = { showSeconds: true, showHints: true, showDate: true };
+
+const SLIDES = [
+  { kind: 'home', style: 'CLASSIC', dark: true, bg: '#1B140C', ink: '#FFF4E6', glow: '#FFB347',
+    de: ['Die Uhrzeit in Bits', 'Deine Binäruhr als Live Wallpaper'], en: ['Tell time in bits', 'Your binary clock as a live wallpaper'] },
+  { kind: 'home', style: 'RINGS', dark: true, bg: '#1C0F17', ink: '#FFE9F1', glow: '#FF6B9A',
+    de: ['7 Stile', 'Jeder in Hell und Dunkel'], en: ['7 styles', 'Each one in light and dark'] },
+  { kind: 'app', style: 'CLASSIC', dark: true, bg: '#11151F', ink: '#EAF0FF', glow: '#7C9CFF',
+    de: ['Zieh sie, wohin du willst', 'Verschieben, zoomen – rastet in der Mitte ein'], en: ['Put it anywhere', 'Drag and pinch – it snaps to the center'] },
+  { kind: 'lock', style: 'TERMINAL', dark: true, bg: '#08130C', ink: '#E6FFEF', glow: '#39FF88',
+    de: ['Sperrbildschirm extra', 'Eigener Stil und Platz – neben der Systemuhr'], en: ['Lock screen, your way', 'Own style and spot – clear of the system clock'] },
+  { kind: 'home', style: 'BINARY', dark: true, bg: '#07121C', ink: '#E5FBFF', glow: '#5CE1E6',
+    de: ['Echt binär', 'Stunde, Minute und Sekunde als Binärzahlen'], en: ['True binary', 'Hours, minutes and seconds in binary'] },
+  { kind: 'home', style: 'LED', dark: true, bg: '#101A0E', ink: '#EEFFE9', glow: '#7CFF6B',
+    de: ['Mit Lernhilfe', 'Ziffern und Stellenwerte zum Mitlesen'], en: ['Built-in reading aid', 'Digits and place values to learn along'] },
+  { kind: 'home', style: 'PAPER', dark: false, bg: '#E9DFD0', ink: '#1A1A1A', glow: '#FFFFFF',
+    de: ['Hell oder dunkel', 'Passt sich automatisch deinem System an'], en: ['Light or dark', 'Follows your system automatically'] },
+];
+
+function el(tag, cls, parent) { const e = document.createElement(tag); if (cls) e.className = cls; if (parent) parent.appendChild(e); return e; }
+
+/** Dezentes Muster aus Bits im Hintergrund. */
+function dots(cv, color) {
+  const c = cv.getContext('2d'); c.fillStyle = color;
+  let seed = 7; const rnd = () => (seed = (seed * 9301 + 49297) % 233280) / 233280;
+  for (let y = 40; y < 1920; y += 72) for (let x = 36; x < 1080; x += 72) {
+    const on = rnd() > 0.72; c.globalAlpha = on ? 0.10 : 0.035;
+    c.beginPath(); c.arc(x, y, 14, 0, 7); c.fill();
+  }
+  c.globalAlpha = 1;
+}
+
+function statusBar(c, W, color) {
+  c.fillStyle = color; c.font = '600 30px "Inter"'; c.textAlign = 'left'; c.letterSpacing = '0px';
+  c.fillText('10:24', 64, 76);
+  c.globalAlpha = .9; c.fillRect(W - 120, 54, 52, 26); c.fillRect(W - 66, 61, 5, 12); c.globalAlpha = 1;
+  [0, 1, 2, 3].forEach(i => c.fillRect(W - 190 + i * 12, 78 - (i + 1) * 7, 8, (i + 1) * 7));
+}
+
+function homeIcons(c, W, H, dark) {
+  c.fillStyle = dark ? 'rgba(255,255,255,0.10)' : 'rgba(0,0,0,0.08)';
+  const n = 4, size = 120, gap = (W - n * size) / (n + 1);
+  for (let i = 0; i < n; i++) { c.beginPath(); c.roundRect(gap + i * (size + gap), H - 230, size, size, 34); c.fill(); }
+  c.beginPath(); c.roundRect(60, H - 400, W - 120, 104, 52); c.fill(); // Suchleiste
+}
+
+function render(lang) {
+  const out = [];
+  SLIDES.forEach((s, i) => {
+    const slide = el('div', 'slide', document.getElementById('root'));
+    slide.style.background = s.bg; slide.style.color = s.ink;
+    const pat = el('canvas', 'bgdots', slide); pat.width = 1080; pat.height = 1920; dots(pat, s.glow);
+    const g = el('div', 'glow', slide); g.style.background = `radial-gradient(circle, ${s.glow}66 0%, ${s.glow}22 40%, transparent 68%)`;
+    const head = el('div', 'head', slide);
+    el('h1', '', head).textContent = s[lang][0];
+    el('p', '', head).textContent = s[lang][1];
+    const phone = el('div', 'phone', slide);
+    const screen = el('div', 'screen', phone);
+    el('div', 'island', screen);
+    const W = 750, H = 1680;
+    const settings = { ...base, style: s.style };
+
+    if (s.kind === 'home') {
+      const cv = el('canvas', '', screen); cv.width = W; cv.height = H; const c = cv.getContext('2d');
+      drawClock(c, W, H, settings, T, DATE[lang], { dark: s.dark, placement: { x: 0.5, y: 0.42, size: 1 } });
+      const ink = STYLES[s.style][s.dark ? 'dark' : 'light'].text1;
+      statusBar(c, W, ink); homeIcons(c, W, H, s.dark);
+    } else if (s.kind === 'lock') {
+      const cv = el('canvas', '', screen); cv.width = W; cv.height = H; const c = cv.getContext('2d');
+      drawClock(c, W, H, { ...settings, showDate: false }, T, null, { dark: s.dark, placement: { x: 0.5, y: 0.62, size: 0.9 } });
+      const p = STYLES[s.style].dark;
+      statusBar(c, W, p.text1);
+      c.fillStyle = '#E8F5EC'; c.textAlign = 'center'; c.letterSpacing = '0px';
+      c.font = '300 190px "Inter"'; c.fillText('10:24', W / 2, 400);
+      c.font = '500 34px "Inter"'; c.fillText(DATE_SHORT[lang], W / 2, 460);
+      c.globalAlpha = .7; c.beginPath(); c.arc(W / 2, H - 120, 44, 0, 7); c.strokeStyle = '#E8F5EC'; c.lineWidth = 4; c.stroke(); c.globalAlpha = 1;
+    } else {
+      // App-Oberfläche
+      const app = el('div', 'app', screen);
+      el('div', 'bar', app).textContent = 'Binary-Clock';
+      const seg = el('div', 'seg', app);
+      const a = el('div', 'on', seg); a.textContent = '✓  ' + (lang === 'de' ? 'Homescreen' : 'Home screen');
+      el('div', '', seg).textContent = lang === 'de' ? 'Sperrbildschirm' : 'Lock screen';
+      const card = el('div', 'card', app);
+      el('b', '', card).textContent = lang === 'de' ? 'Position & Größe' : 'Position & size';
+      el('span', '', card).textContent = lang === 'de'
+        ? 'Zieh die Uhr mit einem Finger, mit zwei Fingern änderst du die Größe. In der Mitte rastet sie ein.'
+        : 'Drag the clock with one finger, pinch with two to resize. It snaps to the center.';
+      const prev = el('div', 'prev', app);
+      const cv = el('canvas', '', prev); cv.width = 470; cv.height = 1018; const c = cv.getContext('2d');
+      drawClock(c, 470, 1018, settings, T, DATE[lang], { dark: true, placement: { x: 0.5, y: 0.5, size: 1.15 }, maxScale: 470 / 390 });
+      c.setLineDash([16, 12]); c.strokeStyle = '#FFB347'; c.lineWidth = 3;
+      c.beginPath(); c.moveTo(235, 0); c.lineTo(235, 1018); c.moveTo(0, 509); c.lineTo(470, 509); c.stroke();
+      el('div', 'chip', prev).textContent = '115 %';
+      const f1 = el('div', 'finger', prev); f1.style.left = '24px'; f1.style.top = '660px';
+      const f2 = el('div', 'finger', prev); f2.style.left = '350px'; f2.style.top = '290px';
+    }
+    out.push(slide);
+  });
+  return out;
+}
+window.renderFeature = (lang) => {
+  const root = document.getElementById('root'); root.innerHTML = '';
+  const f = el('div', 'feat', root);
+  const pat = el('canvas', 'bgdots', f); pat.width = 1024; pat.height = 500; pat.style.position = 'absolute'; dots(pat, '#FFB347');
+  const t = el('div', 'txt', f);
+  el('h1', '', t).textContent = 'Binary-Clock';
+  el('p', '', t).textContent = lang === 'de' ? 'Die Uhrzeit in Bits – als Live Wallpaper' : 'Tell time in bits – as a live wallpaper';
+  [['RINGS', 520, 70, -6], ['CLASSIC', 660, 40, 0], ['TERMINAL', 800, 70, 6]].forEach(([st, x, y, rot], i) => {
+    const m = el('div', 'mini', f); m.style.left = x + 'px'; m.style.top = y + 'px'; m.style.transform = `rotate(${rot}deg)`; m.style.zIndex = i === 1 ? 2 : 1;
+    const cv = el('canvas', '', m); cv.width = 208; cv.height = 478;
+    drawClock(cv.getContext('2d'), 208, 478, { ...base, style: st, showDate: false }, T, null, { dark: true, placement: { x: 0.5, y: 0.42, size: 1 } });
+  });
+};
+window.renderLang = (lang) => { document.getElementById('root').innerHTML = ''; render(lang); return SLIDES.length; };
+</script>
+</body></html>

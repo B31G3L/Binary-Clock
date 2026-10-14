@@ -1,0 +1,10 @@
+import { chromium } from 'playwright';
+import fs from 'node:fs';
+import path from 'node:path';
+const dir = path.dirname(new URL(import.meta.url).pathname);
+fs.mkdirSync(path.join(dir, 'out'), { recursive: true });
+const b = await chromium.launch(); const p = await b.newPage({viewport:{width:2000,height:1000}});
+p.on('pageerror', e => console.log('ERR', e.message));
+await p.goto('file://' + path.join(dir, 'grid.html'));
+await p.locator('#cv').screenshot({ path: path.join(dir, 'out', 'stile-hell-dunkel.png') });
+await b.close();

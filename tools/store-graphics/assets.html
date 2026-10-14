@@ -1,0 +1,86 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>gfx</title><script src="render.js"></script></head>
+<body>
+<script>
+const T = { h: 10, m: 24, s: 36 };
+const DATE = { de: 'Dienstag, 13. Oktober', en: 'Tuesday, October 13' };
+const base = { showSeconds: true, showHints: true, showDate: true };
+
+function canvas(w, h) { const c = document.createElement('canvas'); c.width = w; c.height = h; return c; }
+
+function icon512() {
+  const cv = canvas(512, 512), c = cv.getContext('2d');
+  c.fillStyle = '#0E0F13'; c.fillRect(0, 0, 512, 512);
+  const k = 512 / 108;
+  const lit = [[0,1,1],[1,0,1],[0,0,1]]; // [spalte][zeile]
+  [38, 54, 70].forEach((x, i) => [38, 54, 70].forEach((y, j) => {
+    c.beginPath(); c.arc(x * k, y * k, 6 * k, 0, Math.PI * 2);
+    c.fillStyle = lit[i][j] ? '#FFB347' : 'rgba(255,255,255,0.2)'; c.fill();
+  }));
+  return cv;
+}
+
+function feature(lang) {
+  const cv = canvas(1024, 500), c = cv.getContext('2d');
+  c.fillStyle = '#0E0F13'; c.fillRect(0, 0, 1024, 500);
+  // Uhr rechts
+  const sub = canvas(470, 500);
+  drawClock(sub.getContext('2d'), 470, 500, { ...base, style: 'CLASSIC', showDate: false, showHints: false }, T, null, { maxScale: 1.25, noBackground: true, dark: true });
+  c.drawImage(sub, 540, 0);
+  c.letterSpacing = '0px';
+  c.fillStyle = '#F2EFE9'; c.textAlign = 'left';
+  c.font = 'bold 64px "DejaVu Sans"'; c.fillText('Binary-Clock', 64, 230);
+  c.fillStyle = '#9C9890'; c.font = '28px "DejaVu Sans"';
+  const lines = lang === 'de' ? ['Die Uhrzeit in Bits –', 'als Wallpaper und Widget'] : ['Telling time in bits –', 'as wallpaper and widget'];
+  lines.forEach((l, i) => c.fillText(l, 64, 290 + i * 40));
+  return cv;
+}
+
+const CAPTIONS = {
+  de: ['Die Uhrzeit in Bits', 'Echt binär: Stunde, Minute, Sekunde', 'Mit Lernhilfe zum Ablesen', 'Sieben Stile, eigene Farbe', 'Ringe für Stunde, Minute, Sekunde', 'Der Terminal-Look', 'Hell oder dunkel – wie du willst'],
+  en: ['Telling time in bits', 'True binary: hours, minutes, seconds', 'Built-in reading aid', 'Seven styles, your color', 'Rings for hours, minutes, seconds', 'The terminal look', 'Light or dark – your call'],
+};
+const SHOT_STYLES = ['CLASSIC', 'BINARY', 'LED', 'PAPER', 'RINGS', 'TERMINAL', 'BARS'];
+const SHOT_DARK = [true, true, true, false, true, true, false];
+
+function screenshot(lang, i) {
+  const W = 1080, H = 1920, style = SHOT_STYLES[i];
+  const cv = canvas(W, H), c = cv.getContext('2d');
+  drawClock(c, W, H, { ...base, style }, T, DATE[lang], { dark: SHOT_DARK[i], placement: { x: 0.5, y: 0.54, size: 1.1 } });
+  const light = !SHOT_DARK[i];
+  c.letterSpacing = '0px'; c.textAlign = 'center';
+  c.fillStyle = light ? '#1A1A1A' : '#F2EFE9';
+  c.font = 'bold 64px "DejaVu Sans"';
+  // Umbruch bei langen Texten
+  const words = CAPTIONS[lang][i].split(' '); let line = '', lines = [];
+  words.forEach(w => { const t = line ? line + ' ' + w : w; if (c.measureText(t).width > W - 160) { lines.push(line); line = w; } else line = t; });
+  lines.push(line);
+  lines.forEach((l, k) => c.fillText(l, W / 2, 240 + k * 80));
+  return cv;
+}
+
+function widgetPreview() {
+  const cv = canvas(540, 300), c = cv.getContext('2d');
+  drawClock(c, 540, 300, { ...base, style: 'CLASSIC', showSeconds: false }, T, DATE.de, { radius: 40, maxScale: 10, dark: true });
+  return cv;
+}
+
+function thumbnail() {
+  const cv = canvas(540, 960), c = cv.getContext('2d');
+  drawClock(c, 540, 960, { ...base, style: 'CLASSIC', showDate: false }, T, null, { dark: true, placement: { x: 0.5, y: 0.45, size: 1 } });
+  return cv;
+}
+
+window.outputs = () => {
+  const out = {
+    'icon.png': icon512(), 'widget_preview.png': widgetPreview(), 'wallpaper_thumbnail.png': thumbnail(),
+  };
+  for (const lang of ['de', 'en']) {
+    out[`${lang}/featureGraphic.png`] = feature(lang);
+    for (let i = 0; i < 7; i++) out[`${lang}/${i + 1}.png`] = screenshot(lang, i);
+  }
+  const res = {}; for (const [k, v] of Object.entries(out)) res[k] = v.toDataURL('image/png');
+  return res;
+};
+</script>
+</body></html>

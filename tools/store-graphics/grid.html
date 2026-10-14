@@ -1,0 +1,9 @@
+<!doctype html><html><head><meta charset="utf-8"><title>grid</title><script src="render.js"></script></head><body style="margin:0">
+<canvas id="cv"></canvas>
+<script>
+const styles=['CLASSIC','BINARY','LED','PAPER','RINGS','TERMINAL','BARS'];
+const W=270,H=480,G=12; const cv=document.getElementById('cv'); cv.width=styles.length*(W+G); cv.height=2*(H+G); const c=cv.getContext('2d');
+c.fillStyle='#888'; c.fillRect(0,0,cv.width,cv.height);
+[true,false].forEach((dark,row)=>styles.forEach((st,i)=>{ c.save(); c.translate(i*(W+G),row*(H+G)); c.beginPath(); c.rect(0,0,W,H); c.clip();
+  drawClock(c,W,H,{style:st,showSeconds:true,showHints:true,showDate:true},{h:10,m:24,s:36},'Mittwoch, 14. Oktober',{dark,placement:{x:0.5,y:0.45,size:1}}); c.restore(); }));
+</script></body></html>

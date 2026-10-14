@@ -44,5 +44,7 @@ Jeder Push auf `main` baut per GitHub Actions eine Debug-APK (Artefakt `binary-c
 
 Siehe [RELEASE.md](RELEASE.md). Store-Texte und -Grafiken (DE/EN) liegen unter `fastlane/metadata/android/`.
 
+Die Grafiken werden mit [tools/store-graphics](tools/store-graphics/) erzeugt. Entwürfe (Icon-Ideen, Stil-Übersicht) liegen unter `design/`.
+
 ---
 © Beigel Apps
