@@ -10,7 +10,6 @@ import android.provider.Settings
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
@@ -43,7 +42,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.SingleChoiceSegmentedButtonRow
-import androidx.compose.material3.Slider
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -58,7 +56,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
@@ -73,20 +70,22 @@ import com.beigel.binaryclock.R
 import com.beigel.binaryclock.clock.ClockSettings
 import com.beigel.binaryclock.clock.ClockStyle
 import com.beigel.binaryclock.clock.Encoding
-import com.beigel.binaryclock.clock.Placement
+import com.beigel.binaryclock.clock.Screen
 import com.beigel.binaryclock.clock.ThemeMode
 import com.beigel.binaryclock.data.SettingsRepository
 import com.beigel.binaryclock.wallpaper.BinaryClockWallpaperService
 import com.beigel.binaryclock.widget.WidgetUpdater
-import kotlin.math.roundToInt
-
-private enum class EditTarget { HOME, LOCK }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen(repository: SettingsRepository) {
     val context = LocalContext.current
-    val settings by repository.settings.collectAsStateWithLifecycle()
+    val all by repository.settings.collectAsStateWithLifecycle()
+
+    var screenName by rememberSaveable { mutableStateOf(Screen.HOME.name) }
+    val screen = Screen.valueOf(screenName)
+    val settings = all[screen]
+
     val systemDark = isSystemInDarkTheme()
     val dark = when (settings.themeMode) {
         ThemeMode.SYSTEM -> systemDark
@@ -102,22 +101,12 @@ fun MainScreen(repository: SettingsRepository) {
         onPauseOrDispose { }
     }
 
-    var targetName by rememberSaveable { mutableStateOf(EditTarget.HOME.name) }
-    val target = if (settings.lockScreenAdjust) EditTarget.valueOf(targetName) else EditTarget.HOME
-    val placement = if (target == EditTarget.LOCK) settings.lock else settings.home
-
     val update: ((ClockSettings) -> ClockSettings) -> Unit = { transform ->
-        val before = repository.settings.value
-        repository.update(transform)
-        val after = repository.settings.value
-        // Position/Größe betreffen nur das Wallpaper – das Widget nicht unnötig neu rendern.
-        if (before.copy(home = after.home, lock = after.lock) != after) WidgetUpdater.updateAll(context)
-    }
-    val updatePlacement: ((Placement) -> Placement) -> Unit = { transform ->
-        update { s ->
-            if (target == EditTarget.LOCK) s.copy(lock = transform(s.lock).clamped())
-            else s.copy(home = transform(s.home).clamped())
-        }
+        val before = repository.settings.value.home
+        repository.update(screen, transform)
+        val after = repository.settings.value.home
+        // Das Widget nutzt die Homescreen-Einstellungen – Position/Größe spielen dort keine Rolle.
+        if (before.copy(placement = after.placement) != after) WidgetUpdater.updateAll(context)
     }
 
     Scaffold(
@@ -131,49 +120,65 @@ fun MainScreen(repository: SettingsRepository) {
                 .padding(horizontal = 16.dp, vertical = 8.dp),
             verticalArrangement = Arrangement.spacedBy(24.dp),
         ) {
-            // ---------------------------------------------------------- Vorschau
+            // ------------------------------------------- Bildschirm + Vorschau
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                val previewDescription = stringResource(R.string.cd_preview)
-                val ghost = stringResource(R.string.ghost_system_clock)
-                Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-                    ClockCanvas(
-                        settings = if (target == EditTarget.LOCK) settings.copy(showDate = false) else settings,
-                        dark = dark,
-                        placement = placement,
-                        systemClockGhost = if (target == EditTarget.LOCK) ghost else null,
-                        modifier = Modifier
-                            .heightIn(max = 460.dp)
-                            .aspectRatio(9f / 19.5f)
-                            .clip(RoundedCornerShape(28.dp))
-                            .border(1.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(28.dp))
-                            .semantics { contentDescription = previewDescription }
-                            .pointerInput(target) {
-                                detectTransformGestures { _, pan, zoom, _ ->
-                                    updatePlacement { p ->
-                                        p.copy(
-                                            x = p.x + pan.x / size.width,
-                                            y = p.y + pan.y / size.height,
-                                            size = p.size * zoom,
-                                        )
-                                    }
-                                }
-                            },
-                    )
-                }
-
-                if (settings.lockScreenAdjust) {
-                    SingleChoiceSegmentedButtonRow(Modifier.fillMaxWidth()) {
-                        EditTarget.entries.forEachIndexed { i, t ->
-                            SegmentedButton(
-                                selected = target == t,
-                                onClick = { targetName = t.name },
-                                shape = SegmentedButtonDefaults.itemShape(i, EditTarget.entries.size),
-                            ) {
-                                Text(stringResource(if (t == EditTarget.HOME) R.string.target_home else R.string.target_lock))
-                            }
+                SingleChoiceSegmentedButtonRow(Modifier.fillMaxWidth()) {
+                    Screen.entries.forEachIndexed { i, s ->
+                        SegmentedButton(
+                            selected = screen == s,
+                            onClick = { screenName = s.name },
+                            shape = SegmentedButtonDefaults.itemShape(i, Screen.entries.size),
+                        ) {
+                            Text(stringResource(if (s == Screen.HOME) R.string.target_home else R.string.target_lock))
                         }
                     }
                 }
+
+                Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh)) {
+                    Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                        Text(
+                            stringResource(R.string.placement_hint_title),
+                            style = MaterialTheme.typography.titleSmall,
+                            fontWeight = FontWeight.SemiBold,
+                        )
+                        Text(stringResource(R.string.placement_hint), style = MaterialTheme.typography.bodyMedium)
+                    }
+                }
+
+                Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                    ClockEditor(
+                        settings = settings,
+                        dark = dark,
+                        screen = screen,
+                        ghostLabel = stringResource(R.string.ghost_system_clock),
+                        description = stringResource(R.string.cd_preview),
+                        onPlacementChange = { p -> repository.update(screen) { it.copy(placement = p) } },
+                    )
+                }
+
+                Row(
+                    Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center,
+                ) {
+                    TextButton(onClick = {
+                        val default = if (screen == Screen.HOME) ClockSettings.HOME_DEFAULT else ClockSettings.LOCK_DEFAULT
+                        repository.update(screen) { it.copy(placement = default.placement) }
+                    }) {
+                        Text(stringResource(R.string.action_reset_position))
+                    }
+                    if (screen == Screen.LOCK) {
+                        TextButton(onClick = { repository.copyHomeToLock() }) {
+                            Text(stringResource(R.string.action_copy_from_home))
+                        }
+                    }
+                }
+
+                Text(
+                    text = stringResource(if (screen == Screen.HOME) R.string.scope_home else R.string.scope_lock),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.fillMaxWidth(),
+                )
             }
 
             Button(
@@ -227,57 +232,11 @@ fun MainScreen(repository: SettingsRepository) {
                 )
             }
 
-            // ------------------------------------------------- Position & Größe
-            Section(
-                title = stringResource(R.string.section_position) + if (settings.lockScreenAdjust) {
-                    " · " + stringResource(if (target == EditTarget.LOCK) R.string.target_lock else R.string.target_home)
-                } else {
-                    ""
-                },
-            ) {
-                Text(
-                    text = stringResource(R.string.position_hint),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-                LabeledSlider(
-                    label = stringResource(R.string.slider_horizontal),
-                    value = placement.x,
-                    range = 0f..1f,
-                    display = "${(placement.x * 100).roundToInt()} %",
-                    onChange = { v -> updatePlacement { it.copy(x = v) } },
-                )
-                LabeledSlider(
-                    label = stringResource(R.string.slider_vertical),
-                    value = placement.y,
-                    range = 0f..1f,
-                    display = "${(placement.y * 100).roundToInt()} %",
-                    onChange = { v -> updatePlacement { it.copy(y = v) } },
-                )
-                LabeledSlider(
-                    label = stringResource(R.string.slider_size),
-                    value = placement.size,
-                    range = Placement.MIN_SIZE..Placement.MAX_SIZE,
-                    display = "${(placement.size * 100).roundToInt()} %",
-                    onChange = { v -> updatePlacement { it.copy(size = v) } },
-                )
-                TextButton(
-                    onClick = {
-                        updatePlacement {
-                            if (target == EditTarget.LOCK) Placement.LOCK_DEFAULT else Placement.HOME_DEFAULT
-                        }
-                    },
-                    modifier = Modifier.align(Alignment.End),
-                ) {
-                    Text(stringResource(R.string.action_reset))
-                }
-            }
-
             // ------------------------------------------------------------ Anzeige
             Section(title = stringResource(R.string.section_display)) {
                 SwitchRow(
                     title = stringResource(R.string.option_seconds),
-                    subtitle = stringResource(R.string.option_seconds_desc),
+                    subtitle = if (screen == Screen.HOME) stringResource(R.string.option_seconds_desc) else null,
                     checked = settings.showSeconds,
                     onChange = { v -> update { it.copy(showSeconds = v) } },
                 )
@@ -292,12 +251,6 @@ fun MainScreen(repository: SettingsRepository) {
                     subtitle = null,
                     checked = settings.showDate,
                     onChange = { v -> update { it.copy(showDate = v) } },
-                )
-                SwitchRow(
-                    title = stringResource(R.string.option_lock_adjust),
-                    subtitle = stringResource(R.string.option_lock_adjust_desc),
-                    checked = settings.lockScreenAdjust,
-                    onChange = { v -> update { it.copy(lockScreenAdjust = v) } },
                 )
             }
 
@@ -416,28 +369,6 @@ private fun AccentPicker(settings: ClockSettings, dark: Boolean, onPick: (Int?) 
                 }
             }
         }
-    }
-}
-
-@Composable
-private fun LabeledSlider(
-    label: String,
-    value: Float,
-    range: ClosedFloatingPointRange<Float>,
-    display: String,
-    onChange: (Float) -> Unit,
-) {
-    Column {
-        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-            Text(label, style = MaterialTheme.typography.bodyMedium)
-            Text(display, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
-        }
-        Slider(
-            value = value.coerceIn(range.start, range.endInclusive),
-            onValueChange = onChange,
-            valueRange = range,
-            modifier = Modifier.semantics { contentDescription = label },
-        )
     }
 }
 

@@ -24,8 +24,6 @@
     <string name="option_hints">Reading aid</string>
     <string name="option_hints_desc">Also shows the time or place values as numbers</string>
     <string name="option_date">Show date</string>
-    <string name="option_lock_adjust">Separate layout for lock screen</string>
-    <string name="option_lock_adjust_desc">Own position and size there, without the date – so it doesn\'t collide with the system clock</string>
 
     <string name="action_set_wallpaper">Set as live wallpaper</string>
     <string name="widget_hint">Widget: long-press your home screen → Widgets → Binary-Clock.</string>
@@ -44,15 +42,14 @@
     <string name="theme_system">System</string>
     <string name="theme_light">Light</string>
     <string name="theme_dark">Dark</string>
-
-    <string name="section_position">Position &amp; size</string>
     <string name="target_home">Home screen</string>
     <string name="target_lock">Lock screen</string>
-    <string name="position_hint">Drag the clock in the preview to move it, pinch with two fingers to resize.</string>
-    <string name="slider_horizontal">Horizontal</string>
-    <string name="slider_vertical">Vertical</string>
-    <string name="slider_size">Size</string>
-    <string name="action_reset">Reset</string>
     <string name="ghost_system_clock">System clock</string>
     <string name="how_to_read_rings">Inner ring: hours, middle: minutes, outer: seconds. Clockwise from the top the segments are worth 32 (16 for hours), 16, 8, 4, 2 and 1 – add up the lit ones.</string>
+    <string name="placement_hint_title">Position &amp; size</string>
+    <string name="placement_hint">Drag the clock in the preview with one finger. Pinch with two fingers to resize. It snaps to the center.</string>
+    <string name="action_reset_position">Reset position</string>
+    <string name="scope_home">All settings below apply to the home screen and the widget.</string>
+    <string name="scope_lock">All settings below apply to the lock screen only.</string>
+    <string name="action_copy_from_home">Copy from home screen</string>
 </resources>

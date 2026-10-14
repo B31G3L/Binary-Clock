@@ -115,6 +115,7 @@ data class Placement(
     }
 }
 
+/** Einstellungen für einen Bildschirm (Homescreen oder Sperrbildschirm). */
 data class ClockSettings(
     val style: ClockStyle = ClockStyle.CLASSIC,
     /** null = Standardfarbe des Stils. */
@@ -123,10 +124,7 @@ data class ClockSettings(
     val showHints: Boolean = true,
     val showDate: Boolean = true,
     val themeMode: ThemeMode = ThemeMode.SYSTEM,
-    val home: Placement = Placement.HOME_DEFAULT,
-    /** Eigene Position/Größe auf dem Sperrbildschirm, dort ohne Datum. */
-    val lockScreenAdjust: Boolean = true,
-    val lock: Placement = Placement.LOCK_DEFAULT,
+    val placement: Placement = Placement.HOME_DEFAULT,
 ) {
     fun accent(dark: Boolean): Int = accentOverride ?: style.palette(dark).accent
 
@@ -141,7 +139,25 @@ data class ClockSettings(
             0xFFFF5A4E.toInt(), // Rot
             0xFF3B82F6.toInt(), // Blau
         )
+
+        val HOME_DEFAULT = ClockSettings()
+
+        /** Sperrbildschirm: ohne Datum (zeigt das System schon) und unter der Systemuhr. */
+        val LOCK_DEFAULT = ClockSettings(showDate = false, placement = Placement.LOCK_DEFAULT)
     }
+}
+
+enum class Screen { HOME, LOCK }
+
+/** Homescreen und Sperrbildschirm sind komplett unabhängig voneinander einstellbar. */
+data class AppSettings(
+    val home: ClockSettings = ClockSettings.HOME_DEFAULT,
+    val lock: ClockSettings = ClockSettings.LOCK_DEFAULT,
+) {
+    operator fun get(screen: Screen): ClockSettings = if (screen == Screen.HOME) home else lock
+
+    fun with(screen: Screen, settings: ClockSettings): AppSettings =
+        if (screen == Screen.HOME) copy(home = settings) else copy(lock = settings)
 }
 
 data class ClockTime(val hour: Int, val minute: Int, val second: Int)

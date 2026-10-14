@@ -17,7 +17,9 @@ import android.view.SurfaceHolder
 import androidx.annotation.RequiresApi
 import com.beigel.binaryclock.appContainer
 import com.beigel.binaryclock.clock.ClockRenderer
+import com.beigel.binaryclock.clock.AppSettings
 import com.beigel.binaryclock.clock.ClockSettings
+import com.beigel.binaryclock.clock.Screen
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -51,7 +53,7 @@ class BinaryClockWallpaperService : WallpaperService() {
         private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
         private val renderer = ClockRenderer()
         private val keyguard = getSystemService(KeyguardManager::class.java)
-        private var settings: ClockSettings = applicationContext.appContainer.settingsRepository.settings.value
+        private var settings: AppSettings = applicationContext.appContainer.settingsRepository.settings.value
         private var visible = false
         private var surfaceWidth = 0
         private var surfaceHeight = 0
@@ -67,6 +69,7 @@ class BinaryClockWallpaperService : WallpaperService() {
         /** Sperren/Entsperren: sofort im passenden Layout neu zeichnen. */
         private val lockReceiver = object : BroadcastReceiver() {
             override fun onReceive(context: Context, intent: Intent) {
+                updateColorsIfNeeded()
                 drawFrame()
                 // Die Keyguard-Animation dauert etwas – kurz danach noch einmal zeichnen.
                 handler.postDelayed({ drawFrame() }, 400)
@@ -134,9 +137,10 @@ class BinaryClockWallpaperService : WallpaperService() {
          */
         @RequiresApi(Build.VERSION_CODES.O_MR1)
         override fun onComputeColors(): WallpaperColors {
-            val dark = isDark()
-            val bg = Color.valueOf(settings.style.palette(dark).background)
-            val accent = Color.valueOf(settings.accent(dark))
+            val cfg = current()
+            val dark = isDark(cfg)
+            val bg = Color.valueOf(cfg.style.palette(dark).background)
+            val accent = Color.valueOf(cfg.accent(dark))
             return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                 val hints = if (dark) WallpaperColors.HINT_SUPPORTS_DARK_THEME else WallpaperColors.HINT_SUPPORTS_DARK_TEXT
                 WallpaperColors(bg, accent, null, hints)
@@ -147,16 +151,20 @@ class BinaryClockWallpaperService : WallpaperService() {
 
         private fun updateColorsIfNeeded() {
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O_MR1) return
-            val dark = isDark()
-            val key = settings.style.palette(dark).background.toLong() shl 32 or
-                (settings.accent(dark).toLong() and 0xFFFFFFFFL)
+            val cfg = current()
+            val dark = isDark(cfg)
+            val key = cfg.style.palette(dark).background.toLong() shl 32 or
+                (cfg.accent(dark).toLong() and 0xFFFFFFFFL)
             if (key != lastColorKey) {
                 lastColorKey = key
                 notifyColorsChanged()
             }
         }
 
-        private fun isDark() = settings.themeMode.isDark(this@BinaryClockWallpaperService)
+        private fun isDark(cfg: ClockSettings) = cfg.themeMode.isDark(this@BinaryClockWallpaperService)
+
+        /** Einstellungen des Bildschirms, der gerade zu sehen ist. */
+        private fun current(): ClockSettings = settings[if (onLockScreen()) Screen.LOCK else Screen.HOME]
 
         private fun restartTicking() {
             handler.removeCallbacks(tick)
@@ -166,7 +174,7 @@ class BinaryClockWallpaperService : WallpaperService() {
         private fun scheduleNext() {
             if (!visible) return
             val now = System.currentTimeMillis()
-            val period = if (settings.showSeconds) 1_000L else 60_000L
+            val period = if (current().showSeconds) 1_000L else 60_000L
             // Auf die nächste volle Sekunde/Minute ausrichten, damit nichts „nachhinkt“.
             handler.postDelayed(tick, period - now % period + 5)
         }
@@ -186,7 +194,7 @@ class BinaryClockWallpaperService : WallpaperService() {
 
         private fun drawFrame() {
             if (surfaceWidth == 0 || surfaceHeight == 0) return
-            val lock = settings.lockScreenAdjust && onLockScreen()
+            val cfg = current()
             val holder = surfaceHolder
             val canvas = try {
                 holder.lockCanvas()
@@ -198,10 +206,10 @@ class BinaryClockWallpaperService : WallpaperService() {
                     canvas = canvas,
                     width = surfaceWidth.toFloat(),
                     height = surfaceHeight.toFloat(),
-                    settings = if (lock) settings.copy(showDate = false) else settings,
+                    settings = cfg,
                     now = Calendar.getInstance(),
-                    dark = isDark(),
-                    placement = if (lock) settings.lock else settings.home,
+                    dark = isDark(cfg),
+                    placement = cfg.placement,
                 )
             } finally {
                 holder.unlockCanvasAndPost(canvas)

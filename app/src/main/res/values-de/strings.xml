@@ -23,8 +23,6 @@
     <string name="option_hints">Lernhilfe</string>
     <string name="option_hints_desc">Zeigt Uhrzeit bzw. Stellenwerte zusätzlich als Zahlen</string>
     <string name="option_date">Datum anzeigen</string>
-    <string name="option_lock_adjust">Eigenes Layout für den Sperrbildschirm</string>
-    <string name="option_lock_adjust_desc">Eigene Position und Größe, dort ohne Datum – damit sie nicht mit der Systemuhr kollidiert</string>
 
     <string name="action_set_wallpaper">Als Live Wallpaper festlegen</string>
     <string name="widget_hint">Widget: lange auf den Homescreen tippen → Widgets → Binary-Clock.</string>
@@ -43,15 +41,14 @@
     <string name="theme_system">System</string>
     <string name="theme_light">Hell</string>
     <string name="theme_dark">Dunkel</string>
-
-    <string name="section_position">Position &amp; Größe</string>
     <string name="target_home">Homescreen</string>
     <string name="target_lock">Sperrbildschirm</string>
-    <string name="position_hint">Zieh die Uhr in der Vorschau an die gewünschte Stelle, mit zwei Fingern änderst du die Größe.</string>
-    <string name="slider_horizontal">Horizontal</string>
-    <string name="slider_vertical">Vertikal</string>
-    <string name="slider_size">Größe</string>
-    <string name="action_reset">Zurücksetzen</string>
     <string name="ghost_system_clock">Systemuhr</string>
     <string name="how_to_read_rings">Innen Stunde, Mitte Minute, außen Sekunde. Im Uhrzeigersinn ab oben haben die Segmente die Werte 32 (bei Stunden 16), 16, 8, 4, 2 und 1 – addiere die leuchtenden.</string>
+    <string name="placement_hint_title">Position &amp; Größe</string>
+    <string name="placement_hint">Zieh die Uhr in der Vorschau mit einem Finger an die gewünschte Stelle. Mit zwei Fingern änderst du die Größe. In der Mitte rastet sie ein.</string>
+    <string name="action_reset_position">Position zurücksetzen</string>
+    <string name="scope_home">Alle Einstellungen unten gelten für den Homescreen und das Widget.</string>
+    <string name="scope_lock">Alle Einstellungen unten gelten nur für den Sperrbildschirm.</string>
+    <string name="action_copy_from_home">Vom Homescreen übernehmen</string>
 </resources>

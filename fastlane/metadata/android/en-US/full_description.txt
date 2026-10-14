@@ -13,7 +13,7 @@ MAKE IT YOURS
 • Light, dark or automatic, following your system
 • Pick any accent color
 • Place and size the clock freely – just drag and pinch in the preview
-• Separate layout for the lock screen, so it doesn't collide with the system clock
+• Set up home screen and lock screen completely independently
 • Show or hide seconds, date and the reading aid
 
 READING AID

@@ -96,7 +96,8 @@ object WidgetUpdater {
         val scaleToPx = w / (widthDp * density)
 
         val bitmap = createBitmap(w.toInt().coerceAtLeast(1), h.toInt().coerceAtLeast(1))
-        val settings = context.appContainer.settingsRepository.settings.value
+        // Das Widget liegt auf dem Homescreen und nutzt dessen Einstellungen.
+        val settings = context.appContainer.settingsRepository.settings.value.home
             .copy(showSeconds = false)
         renderer.draw(
             canvas = Canvas(bitmap),

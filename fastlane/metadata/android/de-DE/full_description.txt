@@ -13,7 +13,7 @@ ANPASSBAR
 • Hell, dunkel oder automatisch passend zum System
 • Akzentfarbe frei wählbar
 • Position und Größe frei wählbar – einfach in der Vorschau ziehen und zoomen
-• Eigenes Layout für den Sperrbildschirm, damit die Uhr nicht mit der Systemuhr kollidiert
+• Homescreen und Sperrbildschirm komplett unabhängig einstellbar
 • Sekunden, Datum und Lernhilfe ein- oder ausblenden
 
 LERNHILFE

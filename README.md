@@ -13,7 +13,8 @@ Eine Binäruhr für Android – als **Live Wallpaper** (Homescreen + Sperrbildsc
   - *Terminal* – Einsen und Nullen in Monospace
   - *Balken* – minimalistische Striche (BCD)
 - Akzentfarbe frei wählbar
-- Position und Größe frei wählbar (Ziehen/Zoomen in der Vorschau oder Schieberegler), getrennt für Homescreen und Sperrbildschirm
+- Homescreen und Sperrbildschirm komplett unabhängig einstellbar (Stil, Farbe, Hell/Dunkel, Anzeige, Position, Größe)
+- Position und Größe per Ziehen/Zoomen in der Vorschau, mit Einrasten in der Mitte
 - Sekunden, Lernhilfe (Zahlen/Stellenwerte) und Datum ein-/ausblendbar
 - Live Wallpaper tickt sekündlich, aber nur solange es sichtbar ist (akkuschonend)
 - Widget aktualisiert sich zu jeder vollen Minute (exakt, wenn die Berechtigung „Wecker & Erinnerungen“ erteilt ist)
