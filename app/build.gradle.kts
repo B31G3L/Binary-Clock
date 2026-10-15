@@ -12,8 +12,8 @@ android {
         applicationId = "com.beigel.binaryclock"
         minSdk = 26
         targetSdk = 36
-        versionCode = 2
-        versionName = "1.0.0"
+        versionCode = 3
+        versionName = "1.0.1"
     }
 
     // Release-Signatur kommt aus Umgebungsvariablen (lokal oder GitHub-Secrets),
