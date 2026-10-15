@@ -52,4 +52,7 @@
     <string name="scope_home">All settings below apply to the home screen and the widget.</string>
     <string name="scope_lock">All settings below apply to the lock screen only.</string>
     <string name="action_copy_from_home">Copy from home screen</string>
+    <string name="rate_title">Enjoying Binary-Clock?</string>
+    <string name="rate_text">A rating on Google Play helps a lot – and tells me what to improve.</string>
+    <string name="rate_action">Rate the app</string>
 </resources>

@@ -51,4 +51,7 @@
     <string name="scope_home">Alle Einstellungen unten gelten für den Homescreen und das Widget.</string>
     <string name="scope_lock">Alle Einstellungen unten gelten nur für den Sperrbildschirm.</string>
     <string name="action_copy_from_home">Vom Homescreen übernehmen</string>
+    <string name="rate_title">Gefällt dir Binary-Clock?</string>
+    <string name="rate_text">Eine Bewertung bei Google Play hilft sehr – und zeigt mir, was ich verbessern kann.</string>
+    <string name="rate_action">App bewerten</string>
 </resources>

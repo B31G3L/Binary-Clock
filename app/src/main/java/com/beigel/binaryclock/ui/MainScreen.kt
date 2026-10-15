@@ -78,7 +78,7 @@ import com.beigel.binaryclock.widget.WidgetUpdater
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainScreen(repository: SettingsRepository) {
+fun MainScreen(repository: SettingsRepository, onRate: () -> Unit) {
     val context = LocalContext.current
     val all by repository.settings.collectAsStateWithLifecycle()
 
@@ -276,7 +276,22 @@ fun MainScreen(repository: SettingsRepository) {
                 )
             }
 
+            RateCard(onRate = onRate)
+
             Spacer(Modifier.height(16.dp))
+        }
+    }
+}
+
+@Composable
+private fun RateCard(onRate: () -> Unit) {
+    Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh)) {
+        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+            Text(stringResource(R.string.rate_title), style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.SemiBold)
+            Text(stringResource(R.string.rate_text), style = MaterialTheme.typography.bodyMedium)
+            TextButton(onClick = onRate, modifier = Modifier.align(Alignment.End)) {
+                Text(stringResource(R.string.rate_action))
+            }
         }
     }
 }
