@@ -63,7 +63,16 @@ jobs:
         run: '[ -f app/build/reports/lint.txt ] && echo "::notice title=Lint-Summe::$(tail -1 app/build/reports/lint.txt)" || true'
 
       - name: Release-Build (unsigniert) prüfen – R8/Shrinking
-        run: ./gradlew bundleRelease
+        shell: bash
+        run: |
+          set -o pipefail
+          ./gradlew bundleRelease 2>&1 | tee release.log
+
+      - name: Release-Fehler als Annotationen
+        if: failure()
+        shell: bash
+        run: |
+          grep -iE '^e: |ERROR|Missing class|What went wrong|Caused by|R8' release.log | grep -v '^> Task' | head -10 | while IFS= read -r line; do echo "::error title=Release::$line"; done
 
       - uses: actions/upload-artifact@v4
         with:
